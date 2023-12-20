@@ -1,2 +1,2 @@
 # SpeakUpBot
-Telegram bot for speaking club "Speak up" to manage and register on the meetings.
+Telegram bot for [Speaking club](https://t.me/speakupbrovary) to manage Speaking appointments and register on them.
