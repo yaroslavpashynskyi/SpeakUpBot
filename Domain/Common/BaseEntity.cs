@@ -3,8 +3,9 @@
 namespace Domain.Common;
 
 public abstract class BaseEntity<TId>
+    where TId : struct
 {
-    public required TId Id { get; set; }
+    public TId Id { get; set; }
 
     private readonly List<BaseEvent> _domainEvents = new();
 
