@@ -2,9 +2,9 @@
 
 namespace Domain.Common;
 
-public abstract class BaseEntity<T>
+public abstract class BaseEntity<TId>
 {
-    public required T Id { get; set; }
+    public required TId Id { get; set; }
 
     private readonly List<BaseEvent> _domainEvents = new();
 
