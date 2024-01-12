@@ -1,5 +1,6 @@
 ﻿using Application.Users.Queries.GetUserRole;
 
+using Bot.Forms.Admin;
 using Bot.Forms.Common.UserRegistration;
 
 using Domain.Enums;
@@ -37,7 +38,7 @@ public class StartForm : FormBase
                 await Device.Send("Вітаємо вас, звичайний користувач!");
                 break;
             case Role.Admin:
-                await Device.Send("Вітаємо вас, адміністратор!");
+                await this.NavigateTo<AdminMenuForm>();
                 break;
             default:
                 await this.NavigateTo<StartUserRegistrationForm>();
