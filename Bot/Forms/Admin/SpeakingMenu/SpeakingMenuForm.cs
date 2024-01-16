@@ -1,5 +1,4 @@
-﻿using Bot.Forms.Admin.SpeakingMenu;
-using Bot.Forms.Admin.VenueMenu;
+﻿using Bot.Forms.Admin.SpeakingMenu.CreateSpeakingSteps;
 
 using TelegramBotBase.Args;
 using TelegramBotBase.Controls.Hybrid;
@@ -7,23 +6,31 @@ using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
-namespace Bot.Forms.Admin;
+namespace Bot.Forms.Admin.SpeakingMenu;
 
-public class AdminMenuForm : AutoCleanForm
+public class SpeakingMenuForm : AutoCleanForm
 {
     private readonly ButtonGrid _mButtons;
     private readonly IReadOnlyList<Type> _allowedForms = new List<Type>
     {
-        typeof(VenueMenuForm),
-        typeof(SpeakingMenuForm)
+        typeof(AdminMenuForm),
+        typeof(SpeakingListForm),
+        typeof(StartCreatingSpeakingForm)
     };
 
-    public AdminMenuForm()
+    public SpeakingMenuForm()
     {
         DeleteMode = EDeleteMode.OnLeavingForm;
 
-        _mButtons = new ButtonGrid { KeyboardType = EKeyboardType.ReplyKeyboard };
-        _mButtons.Title = "Головне Меню Адміністратора";
+        _mButtons = new ButtonGrid
+        {
+            KeyboardType = EKeyboardType.ReplyKeyboard,
+            HeadLayoutButtonRow = new List<ButtonBase>
+            {
+                new("◀️Назад", typeof(AdminMenuForm).ToString())
+            }
+        };
+        _mButtons.Title = "Меню спікінгів";
         _mButtons.ResizeKeyboard = true;
         Init += MenuForm_Init;
     }
@@ -33,8 +40,8 @@ public class AdminMenuForm : AutoCleanForm
         var bf = new ButtonForm();
 
         bf.AddButtonRow(
-            new ButtonBase("Місця проведення📍", typeof(VenueMenuForm).ToString()),
-            new ButtonBase("Спікінги🗣", typeof(SpeakingMenuForm).ToString())
+            new ButtonBase("Створити спікінг➕", typeof(StartCreatingSpeakingForm).ToString()),
+            new ButtonBase("Список спікінгів🗒", typeof(SpeakingListForm).ToString())
         );
 
         _mButtons.DataSource.ButtonForm = bf;
