@@ -2,8 +2,6 @@
 
 using Application.Speakings.Commands.CreateSpeaking;
 
-using MediatR;
-
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -89,7 +87,9 @@ public class StartCreatingSpeakingForm : AutoCleanForm
     {
         if (message.MessageText.Length > 1024)
         {
-            await Device.Send("Занадто багато символів! В одному по");
+            await Device.Send(
+                "Занадто багато символів! В пості повинно бути не більше 1024 символів!"
+            );
             return false;
         }
         property.SetValue(_speakingData, message.MessageText);
