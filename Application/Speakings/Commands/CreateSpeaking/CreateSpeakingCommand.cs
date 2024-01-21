@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 
 using Application.Common.Interfaces;
+using Application.Extensions;
 
 using Domain.Entities;
 
@@ -47,29 +48,8 @@ public class CreateSpeakingCommandHandler : IRequestHandler<CreateSpeakingComman
             return Guid.Empty;
         }
 
-        var speaking = new Speaking
-        {
-            Title = request.Title,
-            Intro = request.Intro,
-            Description = request.Description,
-            Price = request.Price,
-            Seats = request.Seats,
-            TimeOfEvent = request.DateOfEvent.ToDateTime(request.TimeOfEvent),
-            DurationMinutes = request.DurationMinutes,
-            Venue = selectedVenue
-        };
-
-        foreach (var photo in request.Photos)
-        {
-            speaking.Photos.Add(
-                new Photo
-                {
-                    FileId = photo.FileId,
-                    OrdinalNumber = photo.OrdinalNumber,
-                    Speaking = speaking
-                }
-            );
-        }
+        var speaking = request.CreateCommandToSpeaking();
+        speaking.Venue = selectedVenue;
 
         _context.Speakings.Add(speaking);
 
