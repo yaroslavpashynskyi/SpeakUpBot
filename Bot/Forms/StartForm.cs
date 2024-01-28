@@ -2,6 +2,7 @@
 
 using Bot.Forms.Admin;
 using Bot.Forms.Common.UserRegistration;
+using Bot.Forms.Member;
 
 using Domain.Enums;
 
@@ -35,7 +36,7 @@ public class StartForm : FormBase
         switch (userRole)
         {
             case Role.Member:
-                await Device.Send("Вітаємо вас, звичайний користувач!");
+                await this.NavigateTo<MemberMenuForm>();
                 break;
             case Role.Admin:
                 await this.NavigateTo<AdminMenuForm>();

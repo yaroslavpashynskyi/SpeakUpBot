@@ -15,8 +15,7 @@ public class VenueMenuForm : NavigationMenuForm
     public VenueMenuForm()
     {
         MenuTitle = "Меню місць проведення";
-        TopButton.Text = "◀️Назад";
-        TopButton.Value = typeof(AdminMenuForm).ToString();
+        ShowBackButton = true;
         MainButtons.AddRange(
             new[]
             {

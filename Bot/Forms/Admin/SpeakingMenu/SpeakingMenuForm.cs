@@ -15,8 +15,7 @@ public class SpeakingMenuForm : NavigationMenuForm
     public SpeakingMenuForm()
     {
         MenuTitle = "Меню спікінгів";
-        TopButton.Text = "◀️Назад";
-        TopButton.Value = typeof(AdminMenuForm).ToString();
+        ShowBackButton = true;
         MainButtons.AddRange(
             new[]
             {
