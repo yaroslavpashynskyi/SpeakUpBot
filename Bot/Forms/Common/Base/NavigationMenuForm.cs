@@ -14,8 +14,8 @@ public class NavigationMenuForm : AutoCleanForm
 {
     protected ButtonGrid MenuButtonGrid;
     public List<ButtonBase> MainButtons = new();
-    public ButtonBase TopButton = new();
     public string MenuTitle = "Меню";
+    public bool ShowBackButton = false;
 
     public NavigationMenuForm()
     {
@@ -28,11 +28,11 @@ public class NavigationMenuForm : AutoCleanForm
     {
         MenuButtonGrid.Title = MenuTitle;
         MenuButtonGrid.ResizeKeyboard = true;
-        if (
-            !string.IsNullOrWhiteSpace(TopButton.Text)
-            && !string.IsNullOrWhiteSpace(TopButton.Value)
-        )
-            MenuButtonGrid.HeadLayoutButtonRow = new List<ButtonBase> { TopButton };
+        if (ShowBackButton)
+            MenuButtonGrid.HeadLayoutButtonRow = new List<ButtonBase>
+            {
+                new("◀️Назад", Device.PreviousForm.GetType().ToString())
+            };
 
         var bf = new ButtonForm();
         bf.AddSplitted(MainButtons);
