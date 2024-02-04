@@ -1,7 +1,6 @@
 ﻿using Bot.Extensions;
-using Bot.Forms.Admin.SpeakingMenu;
-using Bot.Forms.Admin.VenueMenu;
 using Bot.Forms.Common.Base;
+using Bot.Forms.Member.RegistrationMenu;
 
 using Telegram.Bot.Types.Enums;
 
@@ -21,7 +20,7 @@ public class MemberMenuForm : NavigationMenuForm
             new[]
             {
                 new ButtonBase("Майбутні спікінги💬", typeof(FutureSpeakingsForm).ToString()),
-                new ButtonBase("Мої записи📖", typeof(SpeakingMenuForm).ToString()),
+                new ButtonBase("Мої записи📖", typeof(RegistrationMenuForm).ToString()),
                 _contactButton
             }
         );

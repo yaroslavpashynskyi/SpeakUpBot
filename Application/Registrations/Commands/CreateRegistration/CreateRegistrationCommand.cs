@@ -52,6 +52,10 @@ public class CreateRegistrationCommandHandler
             return RegistrationErrors.RegistrationDuplication;
 
         var registration = new Registration() { Speaking = speaking, User = user };
+
+        if (registration.RegistrationDate > speaking.TimeOfEvent + TimeSpan.FromHours(1))
+            return RegistrationErrors.RegistrationTimeout;
+
         if (user.TransferTicket)
         {
             user.TransferTicket = false;

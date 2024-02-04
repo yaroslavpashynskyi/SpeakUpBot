@@ -31,13 +31,14 @@ public class ListItemsForm<T> : AutoCleanForm
             EnablePaging = true,
             HeadLayoutButtonRow = new List<ButtonBase> { new("◀️Назад", "back") }
         };
-        _mButtons.Title = _listTitle;
-        _mButtons.ResizeKeyboard = true;
+
         Init += ListForm_Init;
     }
 
     protected virtual async Task ListForm_Init(object sender, InitEventArgs e)
     {
+        _mButtons.Title = _listTitle;
+        _mButtons.ResizeKeyboard = true;
         _entities = (await _mediator.Send(_request)).Where(_filter).ToList();
 
         var bf = new ButtonForm();

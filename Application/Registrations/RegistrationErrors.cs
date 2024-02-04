@@ -9,4 +9,9 @@ public static class RegistrationErrors
             "Registration.RegistrationDuplication",
             "Реєстрація на даний спікінг від користувача вже існує"
         );
+    public static readonly Error RegistrationTimeout =
+        new(
+            "Registration.RegistrationTimeout",
+            "На жаль, на даний спікінг реєстрації вже не приймаються😔"
+        );
 }
