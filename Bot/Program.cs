@@ -8,6 +8,8 @@ using TelegramBotBase.Args;
 using TelegramBotBase.Builder;
 using TelegramBotBase.Commands;
 using TelegramBotBase.DependencyInjection;
+using TelegramBotBase.Form;
+using TelegramBotBase.Sessions;
 
 var builder = Host.CreateDefaultBuilder(args);
 
@@ -35,6 +37,15 @@ var bot = BotBaseBuilder
     .Build();
 
 bot.BotCommand += Bb_BotCommand;
+bot.Exception += Bot_Exception;
+
+void Bot_Exception(object? sender, SystemExceptionEventArgs e)
+{
+    var env = app.Services.GetRequiredService<IHostEnvironment>();
+
+    if (env.IsDevelopment())
+        throw e.Error;
+}
 
 bot.UploadBotCommands().Wait();
 
