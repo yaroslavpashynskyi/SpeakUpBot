@@ -52,6 +52,12 @@ bot.UploadBotCommands().Wait();
 await bot.Start();
 
 await app.RunAsync();
+AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+async void CurrentDomain_ProcessExit(object? sender, EventArgs e)
+{
+    foreach (var session in bot.Sessions.SessionList.Values)
+        await ClearSessions(session);
+}
 
 static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
 {
@@ -63,4 +69,12 @@ static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
 
             break;
     }
+}
+
+static async Task<FormBase> ClearSessions(DeviceSession session)
+{
+    var activeForm = session.ActiveForm;
+    if (activeForm.IsAutoCleanForm())
+        await ((AutoCleanForm)activeForm).MessageCleanup();
+    return activeForm;
 }
