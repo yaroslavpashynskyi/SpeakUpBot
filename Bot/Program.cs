@@ -61,12 +61,12 @@ async void CurrentDomain_ProcessExit(object? sender, EventArgs e)
 
 static async Task Bb_BotCommand(object sender, BotCommandEventArgs en)
 {
+    await en.Device.DeleteMessage(en.OriginalMessage);
     switch (en.Command)
     {
         case "/start":
-
-            await en.Device.ActiveForm.NavigateTo<StartForm>();
-
+            var activeForm = await ClearSessions(en.Device);
+            await activeForm.NavigateTo<StartForm>();
             break;
     }
 }
