@@ -10,7 +10,8 @@ public class RegistrationMenuForm : NavigationMenuForm
     public RegistrationMenuForm()
     {
         MenuTitle = "Меню записів📖";
-        ShowBackButton = true;
+
+        AddBackButton<MemberMenuForm>();
         MainButtons.AddRange(
             new[]
             {
@@ -18,7 +19,10 @@ public class RegistrationMenuForm : NavigationMenuForm
                     "Записатись на спікінг🖋",
                     typeof(CreateRegistrationForm).ToString()
                 ),
-                new ButtonBase("Переглянути мої записи📖", typeof(MemberRegistrationList).ToString()),
+                new ButtonBase(
+                    "Переглянути мої записи📖",
+                    typeof(MemberRegistrationList).ToString()
+                ),
             }
         );
         DeleteMode = EDeleteMode.OnLeavingForm;

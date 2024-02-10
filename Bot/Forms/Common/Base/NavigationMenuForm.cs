@@ -1,8 +1,4 @@
-﻿using Bot.Forms.Admin;
-using Bot.Forms.Admin.SpeakingMenu;
-using Bot.Forms.Admin.VenueMenu;
-
-using TelegramBotBase.Args;
+﻿using TelegramBotBase.Args;
 using TelegramBotBase.Controls.Hybrid;
 using TelegramBotBase.DependencyInjection;
 using TelegramBotBase.Enums;
@@ -15,7 +11,6 @@ public class NavigationMenuForm : AutoCleanForm
     protected ButtonGrid MenuButtonGrid;
     public List<ButtonBase> MainButtons = new();
     public string MenuTitle = "Меню";
-    public bool ShowBackButton = false;
 
     public NavigationMenuForm()
     {
@@ -28,11 +23,6 @@ public class NavigationMenuForm : AutoCleanForm
     {
         MenuButtonGrid.Title = MenuTitle;
         MenuButtonGrid.ResizeKeyboard = true;
-        if (ShowBackButton)
-            MenuButtonGrid.HeadLayoutButtonRow = new List<ButtonBase>
-            {
-                new("◀️Назад", Device.PreviousForm.GetType().ToString())
-            };
 
         var bf = new ButtonForm();
         bf.AddSplitted(MainButtons);
@@ -61,5 +51,14 @@ public class NavigationMenuForm : AutoCleanForm
     protected virtual Task HandleOtherButtons(ButtonBase button)
     {
         return Task.CompletedTask;
+    }
+
+    protected void AddBackButton<T>()
+    {
+        var formToNavigate = typeof(T).FullName;
+        MenuButtonGrid.HeadLayoutButtonRow = new List<ButtonBase>
+        {
+            new("◀️Назад", formToNavigate)
+        };
     }
 }

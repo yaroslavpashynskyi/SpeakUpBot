@@ -1,11 +1,6 @@
 ﻿using Bot.Forms.Admin.SpeakingMenu.CreateSpeakingSteps;
-using Bot.Forms.Admin.VenueMenu;
 using Bot.Forms.Common.Base;
 
-using TelegramBotBase.Args;
-using TelegramBotBase.Controls.Hybrid;
-using TelegramBotBase.DependencyInjection;
-using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
 namespace Bot.Forms.Admin.SpeakingMenu;
@@ -15,7 +10,8 @@ public class SpeakingMenuForm : NavigationMenuForm
     public SpeakingMenuForm()
     {
         MenuTitle = "Меню спікінгів";
-        ShowBackButton = true;
+
+        AddBackButton<AdminMenuForm>();
         MainButtons.AddRange(
             new[]
             {
