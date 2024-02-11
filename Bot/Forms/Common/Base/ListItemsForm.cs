@@ -39,7 +39,7 @@ public class ListItemsForm<T> : AutoCleanForm
     {
         _mButtons.Title = _listTitle;
         _mButtons.ResizeKeyboard = true;
-        _entities = (await _mediator.Send(_request)).Where(_filter).ToList();
+        await SetEntities();
 
         var bf = new ButtonForm();
 
@@ -54,9 +54,14 @@ public class ListItemsForm<T> : AutoCleanForm
         AddControl(_mButtons);
     }
 
+    protected virtual async Task SetEntities()
+    {
+        _entities = (await _mediator.Send(_request)).Where(_filter).ToList();
+    }
+
     protected virtual string GetButtonName(T entity)
     {
-        return nameof(T);
+        return typeof(T).Name;
     }
 
     protected virtual async Task List_ButtonClicked(object sender, ButtonClickedEventArgs e)
