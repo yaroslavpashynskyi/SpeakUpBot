@@ -30,6 +30,12 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
         _filter = s => s.TimeOfEvent > DateTime.Now;
     }
 
+    protected override Task SetEntities()
+    {
+        _request = new GetUserUnregisteredSpeakings() { UserTelegramId = Device.DeviceId };
+        return base.SetEntities();
+    }
+
     protected override string GetButtonName(Speaking speaking)
     {
         return $"{speaking.Title} ({speaking.TimeOfEvent.ToString("dd.MM")}),"
