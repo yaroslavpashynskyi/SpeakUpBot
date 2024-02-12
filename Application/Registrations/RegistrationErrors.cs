@@ -14,4 +14,11 @@ public static class RegistrationErrors
             "Registration.RegistrationTimeout",
             "На жаль, на даний спікінг реєстрації вже не приймаються😔"
         );
+    public static readonly Error RegistrationNeedToBeApproved =
+        new(
+            "Registration.RegistrationNeedToBeApproved",
+            "Поки організатор не підтвердить статус платежу, скасувати реєстрацію неможливо"
+        );
+    public static readonly Error RegistrationAlreadyCancelled =
+        new("Registration.RegistrationAlreadyCancelled", "Реєстрація вже скасована");
 }
