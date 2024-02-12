@@ -22,6 +22,7 @@ public static class SpeakingExtensions
         CultureInfo cultureInfo = new CultureInfo("uk-UA");
         StringBuilder post = new StringBuilder();
         string newLine = Environment.NewLine;
+        var localTimeOfEvent = speaking.TimeOfEvent.ToLocalTime();
 
         if (!string.IsNullOrWhiteSpace(speaking.Intro))
         {
@@ -30,11 +31,11 @@ public static class SpeakingExtensions
         }
         post.AppendFormat(
             "📅{0}{1}",
-            speaking.TimeOfEvent.ToString("d MMMM (dddd)", cultureInfo),
+            localTimeOfEvent.ToString("d MMMM (dddd)", cultureInfo),
             newLine
         );
-        var timeStart = speaking.TimeOfEvent.ToShortTimeString();
-        var timeEnd = speaking.TimeOfEvent.AddMinutes(speaking.DurationMinutes).ToShortTimeString();
+        var timeStart = localTimeOfEvent.ToShortTimeString();
+        var timeEnd = localTimeOfEvent.AddMinutes(speaking.DurationMinutes).ToShortTimeString();
         post.AppendFormat("🕔{0} - {1}{2}", timeStart, timeEnd, newLine);
         post.AppendFormat(
             "📍<a href=\"{0}\">{1}</a>",
