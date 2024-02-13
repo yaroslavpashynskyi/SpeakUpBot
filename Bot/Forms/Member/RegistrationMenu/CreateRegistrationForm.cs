@@ -1,12 +1,14 @@
 ﻿using Application.Registrations.Commands.CreateRegistration;
-using Application.Speakings.Queries.GetAllSpeakings;
+using Application.Speakings.Queries.GetUserUnregisteredSpeakings;
 
 using Bot.Extensions;
 using Bot.Forms.Common.Base;
+
 using Domain.Entities;
 using Domain.Enums;
 
 using MediatR;
+
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -25,9 +27,9 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
     {
         _mediator = mediator;
 
-        _request = new GetAllSpeakingsWithVenue();
         _listTitle = "Оберіть спікінг на який бажаєте записатись";
         _filter = s => s.TimeOfEvent > DateTime.Now;
+        _mButtons.NoItemsLabel = "Наразі, немає спікінгів, на які ви б могли записатись😔";
     }
 
     protected override Task SetEntities()
@@ -105,10 +107,16 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
         bf.AddButtonRow(_confirmButton);
 
         string message = $"Вітаємо! Ви успішно зареєструвались на {registration.Speaking.Title}.\n";
+        string footer =
+            "Увага! При скасуванні оплаченої реєстрації за 48 годин до початку спікінгу,"
+            + " наступний спікінг безкоштовний. Інакше, кошти згорають";
 
         if (registration.PaymentStatus == PaymentStatus.PaidByTransferTicket)
             await Device.Send(
-                message + $"Ваш квиток переносу використався, тому ваша реєстраці вже оплачена!",
+                footer =
+                    message
+                    + $"Ваш квиток переносу використався, тому ваша реєстраці вже оплачена!\n"
+                    + footer,
                 bf
             );
         else
@@ -116,12 +124,13 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
             await Device.Send(
                 message
                     + $"Тепер вам потрібно перерахувати {registration.Speaking.Price}грн на карту в повідомлені нижче.\n"
-                    + $"Після того як оплатили, потрібно підтвердити оплату через меню записів.",
+                    + $"Після того як оплатили, потрібно підтвердити оплату через меню записів.\n"
+                    + footer,
                 bf
             );
             await Device.Send("<code>4441111137379347</code>", parseMode: ParseMode.Html);
         }
 
-        RemoveAllControls();
+        RemoveControl(_mButtons);
     }
 }
