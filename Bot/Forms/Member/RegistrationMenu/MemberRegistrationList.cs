@@ -1,4 +1,5 @@
 ﻿using Application.Registrations.Commands.CancelRegistration;
+using Application.Registrations.Commands.RestoreRegistration;
 using Application.Registrations.Queries.GetUserRegistrations;
 
 using Bot.Extensions;
@@ -71,9 +72,7 @@ public class MemberRegistrationList : ListItemsForm<Registration>
         if (_registrationControlMode)
         {
             if (e.Button == null)
-            {
                 return;
-            }
 
             if (e.Button.Value == "backToList")
             {
@@ -81,20 +80,42 @@ public class MemberRegistrationList : ListItemsForm<Registration>
                 return;
             }
 
+            if (_selectedRegistration == null)
+                return;
+
             if (e.Button.Value == _cancelButton.Value)
             {
-                if (_selectedRegistration != null)
-                {
-                    var result = await _mediator.Send(
-                        new CancelRegistrationCommand { Registration = _selectedRegistration }
-                    );
+                var result = await _mediator.Send(
+                    new CancelRegistrationCommand { Registration = _selectedRegistration }
+                );
 
-                    await result.Match(HandleCancellation, (error) => Device.Send(error.Message));
-                    await RenderRegistrationList();
-                }
+                await result.Match(
+                    HandleCancellation,
+                    async (error) => _messageToClear = await Device.Send(error.Message)
+                );
+                await RenderRegistrationList();
+            }
+            else if (e.Button.Value == _restoreRegistrationButton.Value)
+            {
+                var result = await _mediator.Send(
+                    new RestoreRegistrationCommand { Registration = _selectedRegistration }
+                );
+
+                await result.Match(
+                    async (paymentStatus) =>
+                        _messageToClear = await Device.Send(
+                            $"Ви відновили реєстрацію на {_selectedRegistration.Speaking.Title}"
+                                + (
+                                    paymentStatus == PaymentStatus.PaidByTransferTicket
+                                        ? "\nВаш квиток переносу використався, тому ваша реєстрація вже оплачена!"
+                                        : ""
+                                )
+                        ),
+                    async (error) => _messageToClear = await Device.Send(error.Message)
+                );
+                await RenderRegistrationList();
             }
         }
-        return;
     }
 
     private async Task HandleCancellation(CancelledRegistrationResult cancelResult)

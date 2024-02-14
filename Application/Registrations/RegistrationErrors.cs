@@ -12,7 +12,7 @@ public static class RegistrationErrors
     public static readonly Error RegistrationTimeout =
         new(
             "Registration.RegistrationTimeout",
-            "На жаль, на даний спікінг реєстрації вже не приймаються😔"
+            "На жаль, на даний спікінг реєстрації та скасування вже не приймаються😔"
         );
     public static readonly Error RegistrationNeedToBeApproved =
         new(
@@ -21,4 +21,9 @@ public static class RegistrationErrors
         );
     public static readonly Error RegistrationAlreadyCancelled =
         new("Registration.RegistrationAlreadyCancelled", "Реєстрація вже скасована");
+    public static readonly Error RegistrationNotCancelled =
+        new(
+            "Registration.RegistrationNotCancelled",
+            "Реєстрація ще не скасована, для того щоб її відновити"
+        );
 }
