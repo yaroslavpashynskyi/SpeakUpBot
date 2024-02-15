@@ -38,6 +38,10 @@ public class CancelRegistrationCommandHandler
         if (registration == null)
             return NotFoundErrors<Registration>.EntityNotFound;
 
+        var now = DateTime.UtcNow;
+        if (now > registration.Speaking.TimeOfEvent + TimeSpan.FromHours(1))
+            return RegistrationErrors.RegistrationTimeout;
+
         var cancelletionResult = new CancelledRegistrationResult() { TransferTicketGained = false };
 
         switch (registration.PaymentStatus)
@@ -50,10 +54,7 @@ public class CancelRegistrationCommandHandler
                 return RegistrationErrors.RegistrationNeedToBeApproved;
             case PaymentStatus.PaidByCard
             or PaymentStatus.PaidByTransferTicket:
-                var timeevent = registration.Speaking.TimeOfEvent + TimeSpan.FromHours(48);
-                var now = DateTime.UtcNow;
-                var sub = (now - timeevent).TotalHours;
-                if (registration.Speaking.TimeOfEvent + TimeSpan.FromHours(48) > DateTime.UtcNow)
+                if (registration.Speaking.TimeOfEvent + TimeSpan.FromHours(48) > now)
                 {
                     registration.User.TransferTicket = true;
                     cancelletionResult.TransferTicketGained = true;
