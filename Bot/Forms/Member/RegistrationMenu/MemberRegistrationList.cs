@@ -1,4 +1,5 @@
 ﻿using Application.Registrations.Commands.CancelRegistration;
+using Application.Registrations.Commands.ConfirmPayment;
 using Application.Registrations.Commands.RestoreRegistration;
 using Application.Registrations.Queries.GetUserRegistrations;
 
@@ -29,7 +30,8 @@ public class MemberRegistrationList : ListItemsForm<Registration>
     private ButtonBase? _backToMenuButton;
     private readonly ButtonBase _confirmPaymentButton =
         new("Підтвердити оплату✅", "cancelRegistration");
-    private readonly ButtonBase _cancelButton = new("Скасувати реєстрацію⚠️", "cancelRegistration");
+    private readonly ButtonBase _cancelButton =
+        new("Скасувати реєстрацію⚠️", "confirmRegistration");
     private readonly ButtonBase _restoreRegistrationButton =
         new("Відновити реєстрацію🔄", "restoreRegistration");
 
@@ -89,9 +91,9 @@ public class MemberRegistrationList : ListItemsForm<Registration>
                     new CancelRegistrationCommand { Registration = _selectedRegistration }
                 );
 
-                await result.Match(
+                _messageToClear = await result.Match(
                     HandleCancellation,
-                    async (error) => _messageToClear = await Device.Send(error.Message)
+                    (error) => Device.Send(error.Message)
                 );
                 await RenderRegistrationList();
             }
@@ -101,9 +103,9 @@ public class MemberRegistrationList : ListItemsForm<Registration>
                     new RestoreRegistrationCommand { Registration = _selectedRegistration }
                 );
 
-                await result.Match(
-                    async (paymentStatus) =>
-                        _messageToClear = await Device.Send(
+                _messageToClear = await result.Match(
+                    (paymentStatus) =>
+                        Device.Send(
                             $"Ви відновили реєстрацію на {_selectedRegistration.Speaking.Title}"
                                 + (
                                     paymentStatus == PaymentStatus.PaidByTransferTicket
@@ -111,14 +113,31 @@ public class MemberRegistrationList : ListItemsForm<Registration>
                                         : ""
                                 )
                         ),
-                    async (error) => _messageToClear = await Device.Send(error.Message)
+                    (error) => Device.Send(error.Message)
+                );
+                await RenderRegistrationList();
+            }
+            else if (e.Button.Value == _confirmPaymentButton.Value)
+            {
+                var result = await _mediator.Send(
+                    new ConfirmPaymentCommand { Registration = _selectedRegistration }
+                );
+
+                _messageToClear = await result.Match(
+                    (unit) =>
+                        Device.Send(
+                            $"Ви підтвердили оплату на {_selectedRegistration.Speaking.Title}.\n"
+                                + "Очікуйте на підтвердження платежу з боку організатора.\n"
+                                + "Організатор може з вами зв'язатись для уточнення інформації."
+                        ),
+                    (error) => Device.Send(error.Message)
                 );
                 await RenderRegistrationList();
             }
         }
     }
 
-    private async Task HandleCancellation(CancelledRegistrationResult cancelResult)
+    private Task<Message> HandleCancellation(CancelledRegistrationResult cancelResult)
     {
         string message = $"Ви скасували реєстрацію на {_selectedRegistration!.Speaking.Title}. ";
         if (
@@ -129,7 +148,7 @@ public class MemberRegistrationList : ListItemsForm<Registration>
                 ? "Ви встигли скасувати за 48 до початку спікінгу, тому на наступний спікінг, запис безкоштовний."
                 : "Ви не встигли скасувати за 48 до початку спікінгу, тому кошти згорають.";
 
-        _messageToClear = await Device.Send(message);
+        return Device.Send(message);
     }
 
     private async Task RenderRegistrationList()

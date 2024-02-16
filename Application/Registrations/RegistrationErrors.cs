@@ -26,4 +26,6 @@ public static class RegistrationErrors
             "Registration.RegistrationNotCancelled",
             "Реєстрація ще не скасована, для того щоб її відновити"
         );
+    public static readonly Error PaymentNotPending =
+        new("Registration.PaymentNotPending", "Реєстрація не очікує оплату");
 }
