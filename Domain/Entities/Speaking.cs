@@ -1,4 +1,7 @@
-﻿using Domain.Common;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+using Domain.Common;
+using Domain.Enums;
 
 namespace Domain.Entities;
 
@@ -17,4 +20,19 @@ public class Speaking : BaseEntity<Guid>
     public int DurationMinutes { get; set; }
     public Guid VenueId { get; set; }
     public Venue Venue { get; set; } = null!;
+
+    [NotMapped]
+    public SpeakingStatus Status
+    {
+        get
+        {
+            DateTime now = DateTime.UtcNow;
+            if (now < TimeOfEvent)
+                return SpeakingStatus.NotStarted;
+            else if (now > TimeOfEvent && now < TimeOfEvent.AddMinutes(DurationMinutes))
+                return SpeakingStatus.InProgress;
+            else
+                return SpeakingStatus.Completed;
+        }
+    }
 }
