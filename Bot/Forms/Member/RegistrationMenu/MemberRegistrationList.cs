@@ -180,20 +180,41 @@ public class MemberRegistrationList : ListItemsForm<Registration>
         _selectedRegistration = registration;
         _mButtons.EnablePaging = false;
 
-        ButtonBase[] additionalButtons = registration.PaymentStatus switch
-        {
-            PaymentStatus.Pending => new[] { _confirmPaymentButton, _cancelButton },
-            PaymentStatus.ToBeApproved => new ButtonBase[] { },
-            PaymentStatus.Cancelled => new ButtonBase[] { _restoreRegistrationButton },
-            _ => new ButtonBase[] { _cancelButton },
-        };
+        ButtonBase[] additionalButtons =
+            registration.Speaking.Status == SpeakingStatus.Completed
+                ? (Array.Empty<ButtonBase>())
+                : registration.PaymentStatus switch
+                {
+                    PaymentStatus.Pending => new[] { _confirmPaymentButton, _cancelButton },
+                    PaymentStatus.ToBeApproved => Array.Empty<ButtonBase>(),
+                    PaymentStatus.Cancelled => new ButtonBase[] { _restoreRegistrationButton },
+                    _ => new ButtonBase[] { _cancelButton },
+                };
+
         var bf = _controlModeForm.Duplicate();
         bf.AddSplitted(additionalButtons, 1);
         _mButtons.DataSource.ButtonForm = bf;
 
         _backToMenuButton = _mButtons.HeadLayoutButtonRow.ToList().First();
         _mButtons.HeadLayoutButtonRow = null;
-        _mButtons.Title = registration.PaymentStatus.GetDescription();
+        _mButtons.Title = FormatRegistration(registration);
         _mButtons.Updated();
+    }
+
+    private string FormatRegistration(Registration registration)
+    {
+        DateTime registrationDateTime = registration.RegistrationDate.ToLocalTime();
+        DateTime speakingStartDateTime = registration.Speaking.TimeOfEvent.ToLocalTime();
+        DateTime endTime = speakingStartDateTime.AddMinutes(registration.Speaking.DurationMinutes);
+
+        string formattedStartTime = speakingStartDateTime.ToString("dd.MM.yyyy HH:mm");
+        string formattedEndTime = endTime.ToString("HH:mm");
+
+        string formattedTimeRange = $"{formattedStartTime}-{formattedEndTime}";
+        return $"Реєстрація на {registration.Speaking.Title}\n\n"
+            + $"Статус платежу: {registration.PaymentStatus.GetDescription()}\n"
+            + $"Дата та час реєстрації: {registrationDateTime.ToString("dd.MM.yyyy HH:mm")}\n"
+            + $"Дата та час спікінгу: {formattedTimeRange}\n"
+            + $"Статус спікінгу: {registration.Speaking.Status.GetDescription()}";
     }
 }
