@@ -25,7 +25,6 @@ public class MemberRegistrationList : ListItemsForm<Registration>
     private bool _registrationControlMode = false;
     private Registration? _selectedRegistration;
     private readonly ButtonForm _controlModeForm = new ButtonForm();
-    private Message? _messageToClear;
 
     private ButtonBase? _backToMenuButton;
     private readonly ButtonBase _confirmPaymentButton =
@@ -38,7 +37,8 @@ public class MemberRegistrationList : ListItemsForm<Registration>
     public MemberRegistrationList(IMediator mediator)
     {
         _mediator = mediator;
-        _mButtons.KeyboardType = EKeyboardType.InlineKeyBoard;
+        _mButtons.KeyboardType = EKeyboardType.ReplyKeyboard;
+        DeleteMode = EDeleteMode.OnEveryCall;
         _mButtons.MessageParseMode = ParseMode.Html;
         _mButtons.ButtonClicked += OnControlMode_ButtonClicked;
         _listTitle = "Мої записи";
@@ -65,12 +65,6 @@ public class MemberRegistrationList : ListItemsForm<Registration>
 
     private async Task OnControlMode_ButtonClicked(object sender, ButtonClickedEventArgs e)
     {
-        if (_messageToClear != null)
-        {
-            await Device.DeleteMessage(_messageToClear);
-            _messageToClear = null;
-        }
-
         if (_registrationControlMode)
         {
             if (e.Button == null)
@@ -85,25 +79,22 @@ public class MemberRegistrationList : ListItemsForm<Registration>
             if (_selectedRegistration == null)
                 return;
 
-            if (e.Button.Value == _cancelButton.Value)
+            if (e.Button.IsEqual(_cancelButton))
             {
                 var result = await _mediator.Send(
                     new CancelRegistrationCommand { Registration = _selectedRegistration }
                 );
 
-                _messageToClear = await result.Match(
-                    HandleCancellation,
-                    (error) => Device.Send(error.Message)
-                );
+                await result.Match(HandleCancellation, (error) => Device.Send(error.Message));
                 await RenderRegistrationList();
             }
-            else if (e.Button.Value == _restoreRegistrationButton.Value)
+            else if (e.Button.IsEqual(_restoreRegistrationButton))
             {
                 var result = await _mediator.Send(
                     new RestoreRegistrationCommand { Registration = _selectedRegistration }
                 );
 
-                _messageToClear = await result.Match(
+                await result.Match(
                     (paymentStatus) =>
                         Device.Send(
                             $"Ви відновили реєстрацію на {_selectedRegistration.Speaking.Title}"
@@ -117,13 +108,13 @@ public class MemberRegistrationList : ListItemsForm<Registration>
                 );
                 await RenderRegistrationList();
             }
-            else if (e.Button.Value == _confirmPaymentButton.Value)
+            else if (e.Button.IsEqual(_confirmPaymentButton))
             {
                 var result = await _mediator.Send(
                     new ConfirmPaymentCommand { Registration = _selectedRegistration }
                 );
 
-                _messageToClear = await result.Match(
+                await result.Match(
                     (unit) =>
                         Device.Send(
                             $"Ви підтвердили оплату на {_selectedRegistration.Speaking.Title}.\n"
@@ -165,6 +156,7 @@ public class MemberRegistrationList : ListItemsForm<Registration>
         _mButtons.DataSource.ButtonForm = bf;
         _mButtons.HeadLayoutButtonRow = new(_backToMenuButton);
         _mButtons.Title = _listTitle;
+        _mButtons.KeyboardType = EKeyboardType.ReplyKeyboard;
         _mButtons.Updated();
     }
 
@@ -198,6 +190,7 @@ public class MemberRegistrationList : ListItemsForm<Registration>
         _backToMenuButton = _mButtons.HeadLayoutButtonRow.ToList().First();
         _mButtons.HeadLayoutButtonRow = null;
         _mButtons.Title = FormatRegistration(registration);
+        _mButtons.KeyboardType = EKeyboardType.InlineKeyBoard;
         _mButtons.Updated();
     }
 
