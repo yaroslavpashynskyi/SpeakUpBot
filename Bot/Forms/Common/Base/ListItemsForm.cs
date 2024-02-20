@@ -20,6 +20,7 @@ public class ListItemsForm<T> : AutoCleanForm
 
     protected IRequest<List<T>> _request = null!;
     protected string _listTitle = "Список";
+    protected Type? _backForm;
 
     public ListItemsForm()
     {
@@ -73,7 +74,7 @@ public class ListItemsForm<T> : AutoCleanForm
 
         if (e.Button.Value == "back")
         {
-            await this.NavigateTo(Device.PreviousForm.GetType());
+            await this.NavigateTo(_backForm ?? Device.PreviousForm.GetType());
             return;
         }
 
