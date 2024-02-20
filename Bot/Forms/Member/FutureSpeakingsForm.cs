@@ -21,12 +21,12 @@ public class FutureSpeakingsForm : ListItemsForm<Speaking>
 
         _request = new GetAllSpeakingsWithVenue();
         _listTitle = "Майбутні спікінгі";
-        _filter = s => s.TimeOfEvent > DateTime.Now;
+        _filter = s => s.TimeOfEvent.ToLocalTime() > DateTime.Now;
     }
 
     protected override string GetButtonName(Speaking speaking)
     {
-        return $"{speaking.Title} ({speaking.TimeOfEvent.ToString("dd.MM")}),"
+        return $"{speaking.Title} ({speaking.TimeOfEvent.ToLocalTime().ToString("dd.MM")}),"
             + $" {speaking.Venue.City}";
     }
 
