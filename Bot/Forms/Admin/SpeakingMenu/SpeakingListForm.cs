@@ -62,7 +62,7 @@ public class SpeakingListForm : ListItemsForm<Speaking>
 
         if (message.RawData == _registrationListButton.Value)
         {
-            await this.NavigateTo<SpeakingRegistrationsMenuForm>();
+            await this.NavigateTo<SpeakingRegistrationsMenuForm>(_selectedSpeaking);
             return;
         }
         else if (message.RawData == _showPostButton.Value && _selectedSpeaking != null)
