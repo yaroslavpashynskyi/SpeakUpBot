@@ -1,5 +1,6 @@
 ﻿using Bot.Extensions;
 using Bot.Forms.Admin.SpeakingMenu;
+using Bot.Forms.Admin.UsersMenu;
 using Bot.Forms.Admin.VenueMenu;
 using Bot.Forms.Common.Base;
 
@@ -22,7 +23,8 @@ public class AdminMenuForm : NavigationMenuForm
             new[]
             {
                 new ButtonBase("Місця проведення📍", typeof(VenueMenuForm).ToString()),
-                new ButtonBase("Спікінги🗣", typeof(SpeakingMenuForm).ToString())
+                new ButtonBase("Спікінги🗣", typeof(SpeakingMenuForm).ToString()),
+                new ButtonBase("Список користувачів👤", typeof(UsersListForm).ToString())
             }
         );
     }
