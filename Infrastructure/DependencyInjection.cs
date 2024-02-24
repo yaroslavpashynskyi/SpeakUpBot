@@ -4,10 +4,10 @@ using Domain.Enums;
 
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Interceptors;
+using Infrastructure.Services;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -42,6 +42,7 @@ public static class DependencyInjection
             provider => provider.GetRequiredService<ApplicationDbContext>()
         );
 
+        services.AddTransient<INotificationSender, NotificationSender>();
         return services;
     }
 }
