@@ -4,6 +4,7 @@ using Application.Common.Models;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Events;
 
 using MediatR;
 
@@ -43,6 +44,9 @@ public class ConfirmPaymentCommandHandler
 
         registration.PaymentStatus = PaymentStatus.ToBeApproved;
 
+        registration.AddDomainEvent(
+            new RegistrationConfirmationEvent(registration.User, registration.Speaking)
+        );
         await _context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;

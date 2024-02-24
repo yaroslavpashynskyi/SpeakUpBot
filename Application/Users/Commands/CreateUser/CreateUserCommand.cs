@@ -2,6 +2,7 @@
 
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Events;
 
 using MediatR;
 
@@ -49,6 +50,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
 
         _context.Users.Add(user);
 
+        user.AddDomainEvent(new UserCreatedEvent(user));
         await _context.SaveChangesAsync(cancellationToken);
 
         return user.Id;

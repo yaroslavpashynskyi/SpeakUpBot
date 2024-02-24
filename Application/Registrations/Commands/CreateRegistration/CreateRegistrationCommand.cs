@@ -4,6 +4,7 @@ using Application.Common.Models;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Events;
 
 using MediatR;
 
@@ -64,6 +65,7 @@ public class CreateRegistrationCommandHandler
 
         await _context.Registrations.AddAsync(registration);
 
+        registration.AddDomainEvent(new RegistrationCreatedEvent(registration, user, speaking));
         await _context.SaveChangesAsync(cancellationToken);
         return registration;
     }
