@@ -1,5 +1,9 @@
 ﻿using System.Reflection;
 
+using Microsoft.Extensions.Configuration;
+
+using Telegram.Bot;
+
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
@@ -11,6 +15,12 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
 
+        services.AddTransient(
+            (cfg) =>
+                new TelegramBotClient(
+                    cfg.GetRequiredService<IConfiguration>()["BotConfiguration:BotToken"]!
+                )
+        );
         return services;
     }
 }

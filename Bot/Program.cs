@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Telegram.Bot;
+
 using TelegramBotBase.Args;
 using TelegramBotBase.Builder;
 using TelegramBotBase.Commands;
@@ -27,7 +29,7 @@ var bot = BotBaseBuilder
     .WithAPIKey(app.Services.GetRequiredService<IConfiguration>()["BotConfiguration:BotToken"])
     .DefaultMessageLoop()
     .WithServiceProvider<StartForm>(app.Services)
-    .NoProxy()
+    .WithBotClient(app.Services.GetRequiredService<TelegramBotClient>())
     .CustomCommands(a =>
     {
         a.Start("Початок роботи");
