@@ -30,6 +30,9 @@ public class StartForm : FormBase
 
     public override async Task Load(MessageResult message)
     {
+        if (Device.IsGroup || Device.IsChannel)
+            return;
+
         await Device.HideReplyKeyboard();
 
         Role userRole = await _mediator.Send(new GetUserRoleQuery(Device.DeviceId));
