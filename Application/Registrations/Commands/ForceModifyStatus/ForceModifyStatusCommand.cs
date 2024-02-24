@@ -4,6 +4,8 @@ using Application.Common.Models;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Events;
+
 using MediatR;
 
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +42,12 @@ public class ForceModifyStatusCommandHandler
             return NotFoundErrors<Registration>.EntityNotFound;
 
         registration.PaymentStatus = request.PaymentStatus;
+
+        var status = registration.PaymentStatus;
+        if (status == PaymentStatus.PaidByCard || status == PaymentStatus.ToBePaidByCash)
+            registration.AddDomainEvent(
+                new RegistrationApprovalEvent(registration.User, registration.Speaking)
+            );
 
         await _context.SaveChangesAsync(cancellationToken);
 
