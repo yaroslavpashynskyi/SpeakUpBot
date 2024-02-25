@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using Application.Common.Behaviors;
+
 using Microsoft.Extensions.Configuration;
 
 using Telegram.Bot;
@@ -13,6 +15,8 @@ public static class DependencyInjection
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+
+            cfg.AddOpenBehavior(typeof(RequestLoggingPipelineBehavior<,>));
         });
 
         services.AddTransient(
