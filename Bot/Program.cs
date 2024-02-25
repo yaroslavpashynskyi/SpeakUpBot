@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Serilog;
+
 using Telegram.Bot;
 
 using TelegramBotBase.Args;
@@ -14,6 +16,11 @@ using TelegramBotBase.Form;
 using TelegramBotBase.Sessions;
 
 var builder = Host.CreateDefaultBuilder(args);
+
+builder.UseSerilog(
+    (hostingContext, loggerConfiguration) =>
+        loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration)
+);
 
 builder.ConfigureServices(
     (context, services) =>
