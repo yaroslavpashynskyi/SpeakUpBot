@@ -13,6 +13,8 @@ using Humanizer;
 
 using MediatR;
 
+using Telegram.Bot.Types;
+
 using TelegramBotBase.Args;
 
 namespace Bot.Forms.Admin.SpeakingMenu;
@@ -83,6 +85,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
             + $"Інформація про користувача.\n"
             + $"Ім'я: {registration.User.FirstName}\nПрізвище: {registration.User.LastName}\n"
             + $"Номер телефону: {registration.User.PhoneNumber}\n"
+            + $"Рівень англійської: {registration.User.EnglishLevel}\n"
             + $"Квиток переносу: {transferTicketStatus}\n\n"
             + $"<a href=\"tg://user?id={registration.User.TelegramId}\">Зв'язатись з користувачем</a>";
     }

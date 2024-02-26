@@ -32,6 +32,7 @@ public class UsersListForm : ListItemsForm<User>
                 + $"Номер телефону: {user.PhoneNumber}\n"
                 + $"Квиток переносу: {transferTicketStatus}\n"
                 + $"Дата реєстрації користувача: {user.CreatedAt.ToLocalTime()}\n"
+                + $"Рівень англійської: {user.EnglishLevel}\n"
                 + $"Як про нас дізнались: {user.Source.Title}\n\n"
                 + $"<a href=\"tg://user?id={user.TelegramId}\">Зв'язатись з користувачем</a>",
             parseMode: ParseMode.Html
