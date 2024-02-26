@@ -32,7 +32,7 @@ var app = builder.Build();
 var bot = BotBaseBuilder
     .Create()
     .WithAPIKey(app.Services.GetRequiredService<IConfiguration>()["BotConfiguration:BotToken"])
-    .DefaultMessageLoop()
+    .CustomMessageLoop<CustomMessageLoop>()
     .WithServiceProvider<StartForm>(app.Services)
     .WithBotClient(app.Services.GetRequiredService<TelegramBotClient>())
     .CustomCommands(a => a.Start("Головне меню"))
