@@ -2,6 +2,9 @@
 using Bot.Extensions;
 using Bot.Forms;
 
+using Infrastructure.Persistence;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,6 +42,12 @@ var bot = BotBaseBuilder
     .NoSerialization()
     .DefaultLanguage()
     .Build();
+
+var context = app.Services.GetRequiredService<ApplicationDbContext>();
+if (context.Database.GetPendingMigrations().Any())
+{
+    context.Database.Migrate();
+}
 
 bot.AddHandlers(app.Services);
 await bot.Start();
