@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+    depends_on:
+      - db
+      - seq
+    environment:
+      TZ: Europe/Kyiv
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=myDataBase;User Id=myUsername;Password=myPassword;"
+      Serilog__WriteTo__1__Args__serverUrl: "http://seq:5341"
+      BotConfiguration__BotToken: "BOT_TOKEN"
+      BotConfiguration__NotificationGroupId: -1234567890
+      
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: myDataBase
+      POSTGRES_USER: myUsername
+      POSTGRES_PASSWORD: myPassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+      
+  seq:
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - seq_data:/data
+    ports:
+      - "5341:80"
+
+volumes:
+  postgres_data:
+  seq_data:
+
