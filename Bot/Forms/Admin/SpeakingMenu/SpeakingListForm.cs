@@ -41,7 +41,8 @@ public class SpeakingListForm : ListItemsForm<Speaking>
     protected override string GetButtonName(Speaking speaking)
     {
         return $"{speaking.Title}, {speaking.Venue.City} "
-            + $"({PaidRegistrationsCount(speaking)}/{speaking.Registrations.Count}/{speaking.Seats})";
+            + $"({PaidRegistrationsCount(speaking)}/"
+            + $"{speaking.Registrations.Count(r => r.PaymentStatus != PaymentStatus.Cancelled)}/{speaking.Seats})";
     }
 
     private static int PaidRegistrationsCount(Speaking speaking)
@@ -85,7 +86,7 @@ public class SpeakingListForm : ListItemsForm<Speaking>
         _messageToDelete = await Device.Send(
             $"{speaking.Title}, {speaking.Venue.City}\n\n"
                 + $"Оплатили: {PaidRegistrationsCount(speaking)}\n"
-                + $"Зареєстровані: {speaking.Registrations.Count}\n"
+                + $"Зареєстровані: {speaking.Registrations.Count(r => r.PaymentStatus != PaymentStatus.Cancelled)}\n"
                 + $"Максимальна к-сть місць: {speaking.Seats}",
             bf
         );
