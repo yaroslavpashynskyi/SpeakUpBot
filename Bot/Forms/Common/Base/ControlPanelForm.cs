@@ -7,6 +7,7 @@ using MediatR;
 using Telegram.Bot.Types.Enums;
 
 using TelegramBotBase.Args;
+using TelegramBotBase.Base;
 using TelegramBotBase.Enums;
 using TelegramBotBase.Form;
 
@@ -34,7 +35,19 @@ public class ControlPanelForm<T> : ListItemsForm<T>
 
     protected override Task List_ButtonClicked(object sender, ButtonClickedEventArgs e)
     {
+        if (e.Button?.Value == "back" && DeleteMode == EDeleteMode.OnEveryCall)
+        {
+            MessageCleanup();
+        }
         return _controlMode ? Task.CompletedTask : base.List_ButtonClicked(sender, e);
+    }
+
+    public override Task PreLoad(MessageResult message)
+    {
+        if (_controlMode)
+            return base.PreLoad(message);
+
+        return Task.CompletedTask;
     }
 
     private async Task OnControlMode_ButtonClicked(object sender, ButtonClickedEventArgs e)
