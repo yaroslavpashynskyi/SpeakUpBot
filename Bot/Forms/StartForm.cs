@@ -33,8 +33,6 @@ public class StartForm : FormBase
         if (Device.IsGroup || Device.IsChannel)
             return;
 
-        await Device.HideReplyKeyboard();
-
         Role userRole = await _mediator.Send(new GetUserRoleQuery(Device.DeviceId));
         switch (userRole)
         {
