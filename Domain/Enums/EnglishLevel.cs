@@ -4,7 +4,7 @@ namespace Domain.Enums;
 
 public enum EnglishLevel
 {
-    [Description("Впевнений Pre-Intermediate + бокал вина :)")]
+    [Description("Pre-Intermediate + бокал вина :)")]
     PreIntermediate = 1,
     Intermediate,
 

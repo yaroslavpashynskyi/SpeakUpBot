@@ -41,7 +41,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
             CardPaymentConfirmation
         );
 
-        _mButtons.NoItemsLabel = "Реєстрацій на цей спікінінг немає";
+        _mButtons.NoItemsLabel = "Реєстрацій на цей івент немає";
     }
 
     protected override Task ListForm_Init(object sender, InitEventArgs e)

@@ -182,9 +182,9 @@ public class StartCreatingSpeakingForm : AutoCleanForm
     {
         return propertyName switch
         {
-            nameof(CreateSpeakingCommand.Title) => "Дайте назву спікінгу",
+            nameof(CreateSpeakingCommand.Title) => "Дайте назву івенту",
             nameof(CreateSpeakingCommand.Intro) => "Напишить вступ (за бажанням)",
-            nameof(CreateSpeakingCommand.Description) => "Надайте опис до спікінгу",
+            nameof(CreateSpeakingCommand.Description) => "Надайте опис до івенту",
             nameof(CreateSpeakingCommand.Price) => "Ціна запису в ₴ (ціле число більше за 0)",
             nameof(CreateSpeakingCommand.Seats) => "Кількість місць (ціле число більше за 0)",
             nameof(CreateSpeakingCommand.Photos) => "Надішліть до 10 фото для поста в телеграм",

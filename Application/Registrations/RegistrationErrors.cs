@@ -7,12 +7,12 @@ public static class RegistrationErrors
     public static readonly Error RegistrationDuplication =
         new(
             "Registration.RegistrationDuplication",
-            "Реєстрація на даний спікінг від користувача вже існує"
+            "Реєстрація на даний івент від користувача вже існує"
         );
     public static readonly Error RegistrationTimeout =
         new(
             "Registration.RegistrationTimeout",
-            "На жаль, на даний спікінг реєстрації та скасування вже не приймаються😔"
+            "На жаль, на даний івент реєстрації та скасування вже не приймаються😔"
         );
     public static readonly Error RegistrationNeedToBeApproved =
         new(

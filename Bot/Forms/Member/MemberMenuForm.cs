@@ -19,7 +19,7 @@ public class MemberMenuForm : NavigationMenuForm
         MainButtons.AddRange(
             new[]
             {
-                new ButtonBase("Майбутні спікінги💬", typeof(FutureSpeakingsForm).ToString()),
+                new ButtonBase("Майбутні івенти🚀", typeof(FutureSpeakingsForm).ToString()),
                 new ButtonBase("Мої записи📖", typeof(RegistrationMenuForm).ToString()),
                 _contactButton
             }

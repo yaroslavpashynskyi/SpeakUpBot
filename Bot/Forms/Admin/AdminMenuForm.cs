@@ -23,7 +23,7 @@ public class AdminMenuForm : NavigationMenuForm
             new[]
             {
                 new ButtonBase("Місця проведення📍", typeof(VenueMenuForm).ToString()),
-                new ButtonBase("Спікінги🗣", typeof(SpeakingMenuForm).ToString()),
+                new ButtonBase("Івенти🚀", typeof(SpeakingMenuForm).ToString()),
                 new ButtonBase("Список користувачів👤", typeof(UsersListForm).ToString())
             }
         );

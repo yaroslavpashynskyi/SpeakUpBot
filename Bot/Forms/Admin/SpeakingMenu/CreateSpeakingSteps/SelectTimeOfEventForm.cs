@@ -72,7 +72,7 @@ namespace Bot.Forms.Admin.SpeakingMenu.CreateSpeakingSteps
         {
             _speakingData = (CreateSpeakingCommand)e.Args[0];
 
-            _picker = new CalendarPicker { Title = "Оберіть дату проведення спікінгу" };
+            _picker = new CalendarPicker { Title = "Оберіть дату проведення івенту" };
 
             return Task.CompletedTask;
         }

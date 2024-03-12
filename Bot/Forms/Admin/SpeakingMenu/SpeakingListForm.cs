@@ -34,7 +34,7 @@ public class SpeakingListForm : ListItemsForm<Speaking>
         _mediator = mediator;
 
         _request = new GetAllSpeakingsWithRegistrations();
-        _listTitle = "Меню спікінгу";
+        _listTitle = "Меню івентів";
         _backForm = typeof(SpeakingMenuForm);
     }
 

@@ -136,8 +136,8 @@ public class MemberRegistrationList : ListItemsForm<Registration>
             && _selectedRegistration.PaymentStatus != PaymentStatus.ToBePaidByCash
         )
             message += cancelResult.TransferTicketGained
-                ? "Ви встигли скасувати за 48 до початку спікінгу, тому на наступний спікінг, запис безкоштовний."
-                : "Ви не встигли скасувати за 48 до початку спікінгу, тому кошти згорають.";
+                ? "Ви встигли скасувати за 48 до початку івенту, тому на наступний івент, запис безкоштовний."
+                : "Ви не встигли скасувати за 48 до початку івенту, тому кошти згорають.";
 
         return Device.Send(message);
     }
@@ -207,7 +207,7 @@ public class MemberRegistrationList : ListItemsForm<Registration>
         return $"Реєстрація на {registration.Speaking.Title}\n\n"
             + $"Статус платежу: {registration.PaymentStatus.GetDescription()}\n"
             + $"Дата та час реєстрації: {registrationDateTime.ToString("dd.MM.yyyy HH:mm")}\n"
-            + $"Дата та час спікінгу: {formattedTimeRange}\n"
-            + $"Статус спікінгу: {registration.Speaking.Status.GetDescription()}";
+            + $"Дата та час івенту: {formattedTimeRange}\n"
+            + $"Статус івенту: {registration.Speaking.Status.GetDescription()}";
     }
 }

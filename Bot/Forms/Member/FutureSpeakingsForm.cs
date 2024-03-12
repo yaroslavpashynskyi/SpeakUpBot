@@ -20,7 +20,7 @@ public class FutureSpeakingsForm : ListItemsForm<Speaking>
         _mediator = mediator;
 
         _request = new GetAllSpeakingsWithVenue();
-        _listTitle = "Майбутні спікінгі";
+        _listTitle = "Майбутні івенти";
         _filter = s => s.TimeOfEvent.ToLocalTime() > DateTime.Now;
     }
 

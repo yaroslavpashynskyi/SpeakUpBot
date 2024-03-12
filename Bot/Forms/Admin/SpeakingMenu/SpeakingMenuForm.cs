@@ -9,14 +9,14 @@ public class SpeakingMenuForm : NavigationMenuForm
 {
     public SpeakingMenuForm()
     {
-        MenuTitle = "Меню спікінгів";
+        MenuTitle = "Меню івентів";
 
         AddBackButton<AdminMenuForm>();
         MainButtons.AddRange(
             new[]
             {
-                new ButtonBase("Створити спікінг➕", typeof(StartCreatingSpeakingForm).ToString()),
-                new ButtonBase("Список спікінгів🗒", typeof(SpeakingListForm).ToString())
+                new ButtonBase("Створити івент➕", typeof(StartCreatingSpeakingForm).ToString()),
+                new ButtonBase("Список івентів🗒", typeof(SpeakingListForm).ToString())
             }
         );
     }

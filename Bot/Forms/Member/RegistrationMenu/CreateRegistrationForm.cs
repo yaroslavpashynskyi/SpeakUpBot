@@ -27,9 +27,9 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
     {
         _mediator = mediator;
 
-        _listTitle = "Оберіть спікінг на який бажаєте записатись";
+        _listTitle = "Оберіть івент на який бажаєте записатись";
         _filter = s => s.TimeOfEvent > DateTime.Now;
-        _mButtons.NoItemsLabel = "Наразі, немає спікінгів, на які ви б могли записатись😔";
+        _mButtons.NoItemsLabel = "Наразі, немає івентів, на які ви б могли записатись😔";
     }
 
     protected override Task SetEntities()
@@ -88,7 +88,7 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
         var speaking = _entities.Where(_filter).FirstOrDefault(s => s.Id == speakingId);
         if (speaking == null)
         {
-            await Device.Send("Такого спікінгу не існує!");
+            await Device.Send("Такого івенту не існує!");
             return;
         }
         var result = await _mediator.Send(
@@ -108,14 +108,14 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
 
         string message = $"Вітаємо! Ви успішно зареєструвались на {registration.Speaking.Title}.\n";
         string footer =
-            "Увага! При скасуванні оплаченої реєстрації за 48 годин до початку спікінгу,"
-            + " наступний спікінг безкоштовний. Інакше, кошти згорають";
+            "Увага! При скасуванні оплаченої реєстрації за 48 годин до початку івенту,"
+            + " наступний івент безкоштовний. Інакше, кошти згорають";
 
         if (registration.PaymentStatus == PaymentStatus.PaidByTransferTicket)
             await Device.Send(
                 footer =
                     message
-                    + $"Ваш квиток переносу використався, тому ваша реєстраці вже оплачена!\n"
+                    + "Ваш квиток переносу використався, тому ваша реєстрація вже оплачена!\n"
                     + footer,
                 bf
             );
