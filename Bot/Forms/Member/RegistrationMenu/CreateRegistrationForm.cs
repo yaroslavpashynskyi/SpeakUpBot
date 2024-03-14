@@ -1,4 +1,5 @@
-﻿using Application.Registrations.Commands.CreateRegistration;
+﻿using Application.Registrations.Commands.ConfirmPayment;
+using Application.Registrations.Commands.CreateRegistration;
 using Application.Speakings.Queries.GetUserUnregisteredSpeakings;
 
 using Bot.Extensions;
@@ -21,7 +22,10 @@ namespace Bot.Forms.Member.RegistrationMenu;
 public class CreateRegistrationForm : ListItemsForm<Speaking>
 {
     private Message[]? _lastPostMessages = Array.Empty<Message>();
-    private readonly ButtonBase _confirmButton = new("Зрозуміло", "confirm");
+    private Registration? _createdRegistration;
+    private readonly ButtonBase _backButton = new("Повернутись назад", "back");
+    private readonly ButtonBase _confirmButton = new("Підтвердити оплату🟢", "confirmNow");
+    private readonly ButtonBase _confirmLaterButton = new("Підтвердити потім🟡", "confirmLater");
 
     public CreateRegistrationForm(IMediator mediator)
     {
@@ -78,7 +82,23 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
     {
         await message.ConfirmAction();
 
-        if (message.RawData == _confirmButton.Value)
+        if (message.RawData == _confirmButton.Value && _createdRegistration != null)
+        {
+            await MessageCleanup();
+            var confirmResult = await _mediator.Send(
+                new ConfirmPaymentCommand() { Registration = _createdRegistration }
+            );
+            var bf = new ButtonForm();
+            bf.AddButtonRow(_backButton);
+            await confirmResult.Match(
+                (unit) => Device.Send("Ви успішно підтвердити оплату", bf),
+                (error) => Device.Send(error.Message, bf)
+            );
+            return;
+        }
+        else if (
+            message.RawData == _confirmLaterButton.Value || message.RawData == _backButton.Value
+        )
         {
             await this.NavigateTo<MemberMenuForm>();
             return;
@@ -100,11 +120,11 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
 
     private async Task SendSuccess(Registration registration)
     {
+        _createdRegistration = registration;
         await CleanPostMessages();
         await MessageCleanup();
 
         var bf = new ButtonForm();
-        bf.AddButtonRow(_confirmButton);
 
         string message = $"Вітаємо! Ви успішно зареєструвались на {registration.Speaking.Title}.\n";
         string footer =
@@ -112,23 +132,26 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
             + " наступний івент безкоштовний. Інакше, кошти згорають";
 
         if (registration.PaymentStatus == PaymentStatus.PaidByTransferTicket)
+        {
+            bf.AddButtonRow(_backButton);
             await Device.Send(
-                footer =
-                    message
+                message
                     + "Ваш квиток переносу використався, тому ваша реєстрація вже оплачена!\n"
                     + footer,
                 bf
             );
+        }
         else
         {
+            bf.AddButtonRow(_confirmButton);
+            bf.AddButtonRow(_confirmLaterButton);
             await Device.Send(
                 message
-                    + $"Тепер вам потрібно перерахувати {registration.Speaking.Price}грн на карту в повідомлені нижче.\n"
-                    + $"Після того як оплатили, потрібно підтвердити оплату через меню записів.\n"
+                    + $"Тепер вам потрібно перерахувати {registration.Speaking.Price}грн на картку:\n4441111137379347\n"
+                    + $"Можете оплатити прямо зараз та підтвердити, або зробити це пізніше.\n"
                     + footer,
                 bf
             );
-            await Device.Send("<code>4441111137379347</code>", parseMode: ParseMode.Html);
         }
 
         RemoveControl(_mButtons);
