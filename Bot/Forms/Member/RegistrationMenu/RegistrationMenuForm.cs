@@ -18,7 +18,7 @@ public class RegistrationMenuForm : NavigationMenuForm
                 new ButtonBase("Записатись на івент🖋", typeof(CreateRegistrationForm).ToString()),
                 new ButtonBase(
                     "Переглянути мої записи📖",
-                    typeof(MemberRegistrationList).ToString()
+                    typeof(MemberRegistrationListForm).ToString()
                 ),
             }
         );
