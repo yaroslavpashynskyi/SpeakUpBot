@@ -13,6 +13,8 @@ using MediatR;
 
 using Telegram.Bot.Types;
 
+using TelegramBotBase.Base;
+
 namespace Bot.Forms.Member.RegistrationMenu;
 
 public class MemberRegistrationListForm : ControlPanelForm<Registration>
@@ -40,6 +42,7 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
             "restoreRegistration",
             RestoreRegistration
         );
+        _listTitle = "Мої записи";
         _mButtons.NoItemsLabel = "У вас поки немає реєстрацій";
     }
 
@@ -52,6 +55,25 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
     {
         _request = new GetUserRegistrations() { UserTelegramId = Device.DeviceId };
         return base.SetEntities();
+    }
+
+    public override Task Action(MessageResult message)
+    {
+        if (!Guid.TryParse(message.RawData, out var speakingId))
+        {
+            return Task.CompletedTask;
+        }
+
+        var registration = _entities.FirstOrDefault(r => r.Speaking.Id == speakingId);
+        if (registration == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        _backForm = typeof(MemberMenuForm);
+        RenderControlPanel(registration);
+
+        return Task.CompletedTask;
     }
 
     protected override string GetControlTitle(Registration registration)

@@ -2,8 +2,6 @@
 
 using Domain.Common;
 
-using MediatR;
-
 using Telegram.Bot.Types.Enums;
 
 using TelegramBotBase.Args;
@@ -99,7 +97,7 @@ public class ControlPanelForm<T> : ListItemsForm<T>
         return Task.CompletedTask;
     }
 
-    private void RenderControlPanel(T entity)
+    protected void RenderControlPanel(T entity)
     {
         _controlMode = true;
         _selectedEntity = entity;
