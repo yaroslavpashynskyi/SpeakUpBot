@@ -1,5 +1,6 @@
 ﻿using Application.Registrations.Commands.ConfirmPayment;
 using Application.Registrations.Commands.CreateRegistration;
+using Application.Registrations.Queries.DoesUserRegistered;
 using Application.Speakings.Queries.GetUserUnregisteredSpeakings;
 
 using Bot.Extensions;
@@ -11,7 +12,6 @@ using Domain.Enums;
 using MediatR;
 
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 using TelegramBotBase.Base;
 using TelegramBotBase.DependencyInjection;
@@ -26,6 +26,7 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
     private readonly ButtonBase _backButton = new("Повернутись назад", "back");
     private readonly ButtonBase _confirmButton = new("Підтвердити оплату🟢", "confirmNow");
     private readonly ButtonBase _confirmLaterButton = new("Підтвердити потім🟡", "confirmLater");
+    private bool _isRegistered;
 
     public CreateRegistrationForm(IMediator mediator)
     {
@@ -55,9 +56,29 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
         if (sentPost == null)
             return;
 
+        var result = await _mediator.Send(
+            new DoesUserRegisteredQuery()
+            {
+                SpeakingId = speaking.Id,
+                TelegramUserId = Device.DeviceId
+            }
+        );
+        if (result.IsError)
+            return;
+
         var bf = new ButtonForm();
-        bf.AddButtonRow("Підтвердити", speaking.Id.ToString());
-        var confirm = await Device.Send($"Бажаєте записатись на {speaking.Title}?", bf);
+        _isRegistered = result.Value;
+        var button = new ButtonBase(
+            _isRegistered ? "Перейти до запису" : "Підтвердити",
+            speaking.Id.ToString()
+        );
+        bf.AddButtonRow(button);
+        var confirm = await Device.Send(
+            _isRegistered
+                ? $"Ви зареєстровані {speaking.Title}, але запис скасовано. Ви можете відновити його, перейшовши до запису."
+                : $"Бажаєте записатись на {speaking.Title}?",
+            bf
+        );
 
         _lastPostMessages = sentPost;
         _lastPostMessages = _lastPostMessages.Append(confirm).ToArray();
@@ -91,14 +112,13 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
             var bf = new ButtonForm();
             bf.AddButtonRow(_backButton);
             await confirmResult.Match(
-                (unit) => Device.Send("Ви успішно підтвердити оплату", bf),
+                (_) => Device.Send("Ви успішно підтвердити оплату", bf),
                 (error) => Device.Send(error.Message, bf)
             );
             return;
         }
-        else if (
-            message.RawData == _confirmLaterButton.Value || message.RawData == _backButton.Value
-        )
+
+        if (message.RawData == _confirmLaterButton.Value || message.RawData == _backButton.Value)
         {
             await this.NavigateTo<MemberMenuForm>();
             return;
@@ -109,6 +129,12 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
         if (speaking == null)
         {
             await Device.Send("Такого івенту не існує!");
+            return;
+        }
+
+        if (_isRegistered)
+        {
+            await this.NavigateTo<MemberRegistrationListForm>();
             return;
         }
         var result = await _mediator.Send(
