@@ -2,21 +2,21 @@
 
 public readonly struct Result<TValue, TError>
 {
-    private readonly TValue? _value;
-    private readonly TError? _error;
+    public readonly TValue? Value;
+    public readonly TError? Error;
 
     private Result(TValue value)
     {
         IsError = false;
-        _value = value;
-        _error = default;
+        Value = value;
+        Error = default;
     }
 
     private Result(TError error)
     {
         IsError = true;
-        _error = error;
-        _value = default;
+        Error = error;
+        Value = default;
     }
 
     public bool IsError { get; }
@@ -27,5 +27,5 @@ public readonly struct Result<TValue, TError>
     public static implicit operator Result<TValue, TError>(TError error) => new(error);
 
     public TResult Match<TResult>(Func<TValue, TResult> success, Func<TError, TResult> failure) =>
-        IsSuccess ? success(_value!) : failure(_error!);
+        IsSuccess ? success(Value!) : failure(Error!);
 }
