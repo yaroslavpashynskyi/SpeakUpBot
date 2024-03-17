@@ -2,6 +2,7 @@
 using Application.Speakings.Queries.GetAllSpeakings;
 
 using Domain.Entities;
+using Domain.Enums;
 
 using MediatR;
 
@@ -32,7 +33,15 @@ public class GetUserUnregisteredSpeakingsHandler
         return await _context.Speakings
             .Include(s => s.Venue)
             .Include(s => s.Photos)
-            .Where(s => !s.Users.Any(u => u.TelegramId == request.UserTelegramId))
+            .Where(
+                s =>
+                    s.Users.All(u => u.TelegramId != request.UserTelegramId)
+                    || s.Registrations.Any(
+                        r =>
+                            r.User.TelegramId == request.UserTelegramId
+                            && r.PaymentStatus == PaymentStatus.Cancelled
+                    )
+            )
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
