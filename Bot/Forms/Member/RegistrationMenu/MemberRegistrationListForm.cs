@@ -86,7 +86,10 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
         string formattedEndTime = endTime.ToString("HH:mm");
 
         string formattedTimeRange = $"{formattedStartTime}-{formattedEndTime}";
+        var venue = registration.Speaking.Venue;
         return $"Реєстрація на {registration.Speaking.Title}\n\n"
+            + $"Місце проведення: <a href=\"{venue.InstagramUrl}\">{venue.Name}</a>"
+            + $" в м. <a href=\"{venue.LocationUrl}\">{venue.City}</a>\n"
             + $"Статус платежу: {registration.PaymentStatus.GetDescription()}\n"
             + $"Дата та час реєстрації: {registrationDateTime.ToString("dd.MM.yyyy HH:mm")}\n"
             + $"Дата та час івенту: {formattedTimeRange}\n"
