@@ -3,7 +3,7 @@ using Domain.Enums;
 
 namespace Domain.Entities;
 
-public class User : BaseEntity<Guid>
+public class User : BaseEntity<Guid>, IOrderable
 {
     public long TelegramId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -17,4 +17,6 @@ public class User : BaseEntity<Guid>
     public bool TransferTicket { get; set; } = false;
     public ICollection<Registration> Registrations { get; private set; } = new List<Registration>();
     public ICollection<Speaking> Speakings { get; private set; } = new List<Speaking>();
+
+    public object? GetOrderKey() => CreatedAt;
 }

@@ -5,7 +5,7 @@ using Domain.Enums;
 
 namespace Domain.Entities;
 
-public class Speaking : BaseEntity<Guid>
+public class Speaking : BaseEntity<Guid>, IOrderable
 {
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public required string Title { get; set; }
@@ -35,4 +35,6 @@ public class Speaking : BaseEntity<Guid>
                 return SpeakingStatus.Completed;
         }
     }
+
+    public object? GetOrderKey() => TimeOfEvent;
 }

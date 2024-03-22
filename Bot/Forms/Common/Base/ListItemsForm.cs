@@ -16,13 +16,13 @@ public class ListItemsForm<T> : AutoCleanForm
     protected readonly ButtonGrid _mButtons;
     protected IMediator _mediator = null!;
     protected List<T> _entities = new();
-    protected Func<T, bool> _filter = p => true;
+    protected Func<T, bool> _filter = _ => true;
 
     protected IRequest<List<T>> _request = null!;
     protected string _listTitle = "Список";
     protected Type? _backForm;
 
-    public ListItemsForm()
+    protected ListItemsForm()
     {
         DeleteMode = EDeleteMode.OnLeavingForm;
 
@@ -57,7 +57,12 @@ public class ListItemsForm<T> : AutoCleanForm
 
     protected virtual async Task SetEntities()
     {
-        _entities = (await _mediator.Send(_request)).Where(_filter).ToList();
+        var result = (await _mediator.Send(_request)).Where(_filter).ToList();
+
+        if (result.Count > 0 && result[0] is IOrderable)
+            _entities = result.OrderByDescending(e => (e as IOrderable)?.GetOrderKey()).ToList();
+        else
+            _entities = result;
     }
 
     protected virtual string GetButtonName(T entity)
