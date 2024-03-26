@@ -1,4 +1,6 @@
 ﻿using Application.Common.Interfaces;
+using Application.Extensions;
+
 using Domain.Events;
 using MediatR;
 
@@ -20,7 +22,7 @@ public class RegistrationApprovalEventHandler : INotificationHandler<Registratio
     {
         await _notificationSender.SendToUser(
             $"Вітаємо, <b>{notification.User.FirstName}</b>!\n"
-                + $"Вашу оплату на {notification.Speaking.Title} підтверджено організатором!",
+                + $"Вашу оплату на {notification.Speaking.GetName()} підтверджено організатором!",
             notification.User.TelegramId
         );
     }

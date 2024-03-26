@@ -1,4 +1,5 @@
-﻿using Application.Registrations.Commands.ConfirmPayment;
+﻿using Application.Extensions;
+using Application.Registrations.Commands.ConfirmPayment;
 using Application.Registrations.Commands.CreateRegistration;
 using Application.Registrations.Queries.DoesUserRegistered;
 using Application.Speakings.Queries.GetUserUnregisteredSpeakings;
@@ -12,6 +13,7 @@ using Domain.Enums;
 using MediatR;
 
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 using TelegramBotBase.Base;
 using TelegramBotBase.DependencyInjection;
@@ -23,7 +25,6 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
 {
     private Message[]? _lastPostMessages = Array.Empty<Message>();
     private Registration? _createdRegistration;
-    private readonly ButtonBase _backButton = new("Повернутись назад", "back");
     private readonly ButtonBase _confirmButton = new("Підтвердити оплату🟢", "confirmNow");
     private readonly ButtonBase _confirmLaterButton = new("Підтвердити потім🟡", "confirmLater");
     private bool _isRegistered;
@@ -101,6 +102,7 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
 
     public override async Task Action(MessageResult message)
     {
+        var speakingName = _createdRegistration?.Speaking.GetName();
         await message.ConfirmAction();
 
         if (message.RawData == _confirmButton.Value && _createdRegistration != null)
@@ -109,17 +111,29 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
             var confirmResult = await _mediator.Send(
                 new ConfirmPaymentCommand() { Registration = _createdRegistration }
             );
-            var bf = new ButtonForm();
-            bf.AddButtonRow(_backButton);
+
             await confirmResult.Match(
-                (_) => Device.Send("Ви успішно підтвердити оплату", bf),
-                (error) => Device.Send(error.Message, bf)
+                (_) =>
+                    Device.Send(
+                        $"Ви успішно зареєструвались та підтвердити оплату на {speakingName},"
+                            + $" очікуйте поки організатор не підтвердить вашу оплату."
+                    ),
+                (error) => Device.Send(error.Message)
             );
+            LeaveLastMessage();
+
+            await this.NavigateTo<MemberMenuForm>();
             return;
         }
 
-        if (message.RawData == _confirmLaterButton.Value || message.RawData == _backButton.Value)
+        if (message.RawData == _confirmLaterButton.Value)
         {
+            await Device.Send(
+                $"Ви успішно зареєструвались на {speakingName}, але ще не оплатили. Вам потрібно перерахувати"
+                    + $" {_createdRegistration?.Speaking.Price} грн на картку:\n4441111137379347\n"
+                    + $"Після цього підтвердити свою оплату в меню записів."
+            );
+            LeaveLastMessage();
             await this.NavigateTo<MemberMenuForm>();
             return;
         }
@@ -150,33 +164,37 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
         await CleanPostMessages();
         await MessageCleanup();
 
-        var bf = new ButtonForm();
-
-        string message = $"Вітаємо! Ви успішно зареєструвались на {registration.Speaking.Title}.\n";
+        string message =
+            $"Вітаємо! Ви успішно зареєструвались на {registration.Speaking.GetName()}.\n";
         string footer =
             "Увага! При скасуванні оплаченої реєстрації за 48 годин до початку івенту,"
             + " наступний івент безкоштовний. Інакше, кошти згорають";
 
         if (registration.PaymentStatus == PaymentStatus.PaidByTransferTicket)
         {
-            bf.AddButtonRow(_backButton);
             await Device.Send(
                 message
                     + "Ваш квиток переносу використався, тому ваша реєстрація вже оплачена!\n"
-                    + footer,
-                bf
+                    + footer
             );
+            LeaveLastMessage();
+
+            await this.NavigateTo<MemberMenuForm>();
         }
         else
         {
+            var bf = new ButtonForm();
+
             bf.AddButtonRow(_confirmButton);
             bf.AddButtonRow(_confirmLaterButton);
             await Device.Send(
                 message
-                    + $"Тепер вам потрібно перерахувати {registration.Speaking.Price}грн на картку:\n4441111137379347\n"
+                    + $"Тепер вам потрібно перерахувати {registration.Speaking.Price} грн на картку:\n4441111137379347\n"
+                    + "Якщо бажаєте розрахуватись готівкою, то підтвердіть оплату та напишіть організатору про це 👉 @bogdan_pash\n"
                     + $"Можете оплатити прямо зараз та підтвердити, або зробити це пізніше.\n"
                     + footer,
-                bf
+                bf,
+                parseMode: ParseMode.Html
             );
         }
 

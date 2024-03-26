@@ -1,4 +1,5 @@
-﻿using Application.Registrations.Commands.CancelRegistration;
+﻿using Application.Extensions;
+using Application.Registrations.Commands.CancelRegistration;
 using Application.Registrations.Commands.ConfirmPayment;
 using Application.Registrations.Commands.RestoreRegistration;
 using Application.Registrations.Queries.GetUserRegistrations;
@@ -105,12 +106,13 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
         await result.Match(
             (_) =>
                 Device.Send(
-                    $"Ви підтвердили оплату на {_selectedEntity!.Speaking.Title}.\n"
+                    $"Ви підтвердили оплату на {_selectedEntity!.Speaking.GetName()}.\n"
                         + "Очікуйте на підтвердження платежу з боку організатора.\n"
                         + "Організатор може з вами зв'язатись для уточнення інформації."
                 ),
             (error) => Device.Send(error.Message)
         );
+        LeaveLastMessage();
     }
 
     private async Task RestoreRegistration()
@@ -122,7 +124,7 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
         await result.Match(
             (paymentStatus) =>
                 Device.Send(
-                    $"Ви відновили реєстрацію на {_selectedEntity!.Speaking.Title}"
+                    $"Ви відновили реєстрацію на {_selectedEntity!.Speaking.GetName()}"
                         + (
                             paymentStatus == PaymentStatus.PaidByTransferTicket
                                 ? "\nВаш квиток переносу використався, тому ваша реєстрація вже оплачена!"
@@ -131,6 +133,7 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
                 ),
             (error) => Device.Send(error.Message)
         );
+        LeaveLastMessage();
     }
 
     private async Task CancelRegistration()
@@ -140,11 +143,12 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
         );
 
         await result.Match(HandleCancellation, (error) => Device.Send(error.Message));
+        LeaveLastMessage();
     }
 
     private Task<Message> HandleCancellation(CancelledRegistrationResult cancelResult)
     {
-        string message = $"Ви скасували реєстрацію на {_selectedEntity!.Speaking.Title}. ";
+        string message = $"Ви скасували реєстрацію на {_selectedEntity!.Speaking.GetName()}. ";
         if (
             _selectedEntity.PaymentStatus != PaymentStatus.Pending
             && _selectedEntity.PaymentStatus != PaymentStatus.ToBePaidByCash
