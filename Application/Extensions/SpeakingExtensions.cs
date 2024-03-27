@@ -37,5 +37,5 @@ public static class SpeakingExtensions
     }
 
     public static string GetName(this Speaking speaking) =>
-        $"{speaking.Title} ({DateTime.Now.ToString("dd/MM")})";
+        $"{speaking.Title} ({speaking.TimeOfEvent.ToLocalTime().ToString("dd/MM")})";
 }
