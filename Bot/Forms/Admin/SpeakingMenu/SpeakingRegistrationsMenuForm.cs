@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 
+using Application.Extensions;
 using Application.Registrations.Commands.ForceModifyStatus;
 using Application.Registrations.Queries.GetUserRegistrations;
 
@@ -109,16 +110,24 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
             }
         );
         await result.Match(
-            (unit) => Device.Send(string.Format(successMessage, _selectedEntity?.User.FirstName)),
+            (_) =>
+                Device.Send(
+                    string.Format(
+                        successMessage,
+                        _selectedEntity?.User.FirstName,
+                        _selectedEntity?.Speaking.GetName()
+                    )
+                ),
             (error) => Device.Send(error.Message)
         );
+        LeaveLastMessage();
     }
 
     private async Task CardPaymentConfirmation()
     {
         await PaymentConfirmation(
             PaymentStatus.ToBePaidByCash,
-            "Ви успішно підтвердили, що користувач {0} оплатить/оплатив готівкою"
+            "Ви успішно підтвердили, що користувач {0} оплатить/оплатив готівкою реєстрацію на {1}"
         );
     }
 
@@ -126,7 +135,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
     {
         await PaymentConfirmation(
             PaymentStatus.PaidByCard,
-            "Ви успішно підтвердили оплату карткою користувача {0}"
+            "Ви успішно підтвердили оплату карткою користувача {0}, який зареєструвався на {1}"
         );
     }
 }

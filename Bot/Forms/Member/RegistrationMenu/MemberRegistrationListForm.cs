@@ -128,7 +128,9 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
                         + (
                             paymentStatus == PaymentStatus.PaidByTransferTicket
                                 ? "\nВаш квиток переносу використався, тому ваша реєстрація вже оплачена!"
-                                : ""
+                                : "\nВам потрібно перерахувати"
+                                    + $" {_selectedEntity?.Speaking.Price} грн на картку:\n4441111137379347\n"
+                                    + $"Після цього підтвердити свою оплату в меню записів."
                         )
                 ),
             (error) => Device.Send(error.Message)
