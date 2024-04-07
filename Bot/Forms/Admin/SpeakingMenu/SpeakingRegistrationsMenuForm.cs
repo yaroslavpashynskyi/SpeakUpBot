@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 
+using Application.Common.Models;
 using Application.Extensions;
 using Application.Registrations.Commands.ForceModifyStatus;
 using Application.Registrations.Queries.GetUserRegistrations;
@@ -7,6 +8,7 @@ using Application.Registrations.Queries.GetUserRegistrations;
 using Bot.Extensions;
 using Bot.Forms.Common.Base;
 
+using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -64,10 +66,11 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
 
     protected override async Task SetEntities()
     {
-        var result = await _mediator.Send(
+        Result<List<Registration>, Error> result = await _mediator.Send(
             new GetSpeakingRegistrations() { SpeakingId = _selectedSpeaking?.Id ?? Guid.Empty }
         );
-        result.Match((registrations) => _entities = registrations, (error) => _entities = new());
+        if (result.IsSuccess)
+            OrderEntities(result.Value!);
     }
 
     protected override string GetButtonName(Registration registration)

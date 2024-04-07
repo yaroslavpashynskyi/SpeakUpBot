@@ -59,10 +59,15 @@ public class ListItemsForm<T> : AutoCleanForm
     {
         var result = (await _mediator.Send(_request)).Where(_filter).ToList();
 
-        if (result.Count > 0 && result[0] is IOrderable)
-            _entities = result.OrderByDescending(e => (e as IOrderable)?.GetOrderKey()).ToList();
+        OrderEntities(result);
+    }
+
+    protected void OrderEntities(List<T> entities)
+    {
+        if (entities.Count > 0 && entities[0] is IOrderable)
+            _entities = entities.OrderByDescending(e => (e as IOrderable)?.GetOrderKey()).ToList();
         else
-            _entities = result;
+            _entities = entities;
     }
 
     protected virtual string GetButtonName(T entity)
