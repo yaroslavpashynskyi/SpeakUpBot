@@ -13,6 +13,7 @@ using Domain.Enums;
 using MediatR;
 
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 using TelegramBotBase.Base;
 
@@ -156,10 +157,10 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
             && _selectedEntity.PaymentStatus != PaymentStatus.ToBePaidByCash
         )
             message += cancelResult.TransferTicketGained
-                ? "Ви встигли скасувати за 48 до початку івенту, тому на наступний івент, запис безкоштовний."
-                : "Ви не встигли скасувати за 48 до початку івенту, тому кошти згорають.";
+                ? "Ви встигли скасувати за 48 годин до початку івенту, тому запис на наступний івент <b>безкоштовний.</b>"
+                : "Ви не встигли скасувати за 48 годин до початку івенту, тому кошти <b>згорають.</b>";
 
-        return Device.Send(message);
+        return Device.Send(message, parseMode: ParseMode.Html);
     }
 
     protected override ActionButton[] SetControlButtons(Registration registration)
