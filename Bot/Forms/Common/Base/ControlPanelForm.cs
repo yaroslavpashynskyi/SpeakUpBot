@@ -43,7 +43,7 @@ public class ControlPanelForm<T> : ListItemsForm<T>
 
     public override Task PreLoad(MessageResult message)
     {
-        if (_controlMode)
+        if (_controlMode && message.IsAction)
             return base.PreLoad(message);
 
         return Task.CompletedTask;
