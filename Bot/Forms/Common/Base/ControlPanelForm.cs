@@ -27,6 +27,7 @@ public class ControlPanelForm<T> : ListItemsForm<T>
         DeleteMode = EDeleteMode.OnEveryCall;
         _mButtons.MessageParseMode = ParseMode.Html;
         _mButtons.ButtonClicked += OnControlMode_ButtonClicked;
+        _mButtons.DeletePreviousMessage = false;
 
         _controlModeForm.AddButtonRow(new ButtonBase("◀️Повернутись до списку", "backToList"));
     }
