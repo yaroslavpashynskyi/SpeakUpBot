@@ -26,7 +26,6 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
     private Message[]? _lastPostMessages = Array.Empty<Message>();
     private Registration? _createdRegistration;
     private readonly ButtonBase _confirmButton = new("Підтвердити оплату🟢", "confirmNow");
-    private readonly ButtonBase _confirmLaterButton = new("Підтвердити потім🟡", "confirmLater");
     private bool _isRegistered;
 
     public CreateRegistrationForm(IMediator mediator)
@@ -126,18 +125,6 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
             return;
         }
 
-        if (message.RawData == _confirmLaterButton.Value)
-        {
-            await Device.Send(
-                $"Ви успішно зареєструвались на {speakingName}, але ще не оплатили. Вам потрібно перерахувати"
-                    + $" {_createdRegistration?.Speaking.Price} грн на картку:\n4441111137379347\n"
-                    + $"Після цього підтвердити свою оплату в меню записів."
-            );
-            LeaveLastMessage();
-            await this.NavigateTo<MemberMenuForm>();
-            return;
-        }
-
         Guid.TryParse(message.RawData, out var speakingId);
         var speaking = _entities.Where(_filter).FirstOrDefault(s => s.Id == speakingId);
         if (speaking == null)
@@ -186,12 +173,13 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
             var bf = new ButtonForm();
 
             bf.AddButtonRow(_confirmButton);
-            bf.AddButtonRow(_confirmLaterButton);
+
             await Device.Send(
                 message
-                    + $"Тепер вам потрібно перерахувати {registration.Speaking.Price} грн на картку:\n4441111137379347\n"
-                    + "Якщо бажаєте розрахуватись готівкою, то підтвердіть оплату та напишіть організатору про це 👉 @bogdan_pash\n"
-                    + $"Можете оплатити прямо зараз та підтвердити, або зробити це пізніше.\n"
+                    + $"За вами закріплене місце найближчу 1 год, впродовж якої необхідно здійснити оплату в"
+                    + $" {registration.Speaking.Price} грн на картку:\n4441111137379347\n\nМаємо повідомити,"
+                    + " що кількість місць на івент обмежена, тому хто first pay, first served. \n\nУчасть у "
+                    + "заході підтверджується після оплати та підтвердження наявності місця організаторами.\n\n"
                     + footer,
                 bf,
                 parseMode: ParseMode.Html
