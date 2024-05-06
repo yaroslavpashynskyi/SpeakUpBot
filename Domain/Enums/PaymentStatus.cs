@@ -7,6 +7,9 @@ public enum PaymentStatus
     [Description("Очікується оплата")]
     Pending,
 
+    [Description("В резерві")]
+    InReserve,
+
     [Description("Оплата повинна бути підтверджена організатором")]
     ToBeApproved,
 
