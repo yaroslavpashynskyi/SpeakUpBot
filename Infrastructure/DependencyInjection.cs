@@ -21,7 +21,9 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+        services.AddTransient<ISaveChangesInterceptor, AvailableSeatNotificationInterceptor>();
         services.AddTransient<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
         var dataSourceBuilder = new Npgsql.NpgsqlDataSourceBuilder(connectionString);
 
         dataSourceBuilder.MapEnum<EnglishLevel>();

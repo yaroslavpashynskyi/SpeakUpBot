@@ -36,5 +36,12 @@ public class Speaking : BaseEntity<Guid>, IOrderable
         }
     }
 
+    [NotMapped]
+    public int AvailableSeats =>
+        Seats
+        - Registrations.Count(
+            r => r.PaymentStatus is not (PaymentStatus.Cancelled or PaymentStatus.InReserve)
+        );
+
     public object? GetOrderKey() => TimeOfEvent;
 }
