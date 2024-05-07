@@ -10,7 +10,10 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddMediatR(cfg =>
         {
@@ -20,10 +23,7 @@ public static class DependencyInjection
         });
 
         services.AddTransient(
-            (cfg) =>
-                new TelegramBotClient(
-                    cfg.GetRequiredService<IConfiguration>()["BotConfiguration:BotToken"]!
-                )
+            (cfg) => new TelegramBotClient(configuration["BotConfiguration:BotToken"]!)
         );
         return services;
     }

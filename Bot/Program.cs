@@ -27,7 +27,7 @@ builder.ConfigureServices(
     (context, services) =>
     {
         services.AddInfrastructureServices(context.Configuration);
-        services.AddApplicationServices();
+        services.AddApplicationServices(context.Configuration);
     }
 );
 var app = builder.Build();
