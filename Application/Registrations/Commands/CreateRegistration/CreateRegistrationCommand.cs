@@ -39,9 +39,9 @@ public class CreateRegistrationCommandHandler
         if (user == null)
             return NotFoundErrors<User>.EntityNotFound;
 
-        var speaking = await _context.Speakings.FirstOrDefaultAsync(
-            s => s.Id == request.Speaking.Id
-        );
+        var speaking = await _context.Speakings
+            .Include(s => s.Registrations)
+            .FirstOrDefaultAsync(s => s.Id == request.Speaking.Id);
         if (speaking == null)
             return NotFoundErrors<Speaking>.EntityNotFound;
 
@@ -57,7 +57,14 @@ public class CreateRegistrationCommandHandler
         if (registration.RegistrationDate > speaking.TimeOfEvent + TimeSpan.FromHours(1))
             return RegistrationErrors.RegistrationTimeout;
 
-        if (user.TransferTicket)
+        var inReserve = speaking.Registrations.Count(
+            r => r.PaymentStatus == PaymentStatus.InReserve
+        );
+        if (inReserve >= speaking.AvailableSeats)
+        {
+            registration.PaymentStatus = PaymentStatus.InReserve;
+        }
+        else if (user.TransferTicket)
         {
             user.TransferTicket = false;
             registration.PaymentStatus = PaymentStatus.PaidByTransferTicket;

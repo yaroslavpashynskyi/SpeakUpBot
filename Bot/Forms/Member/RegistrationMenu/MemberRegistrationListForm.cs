@@ -1,4 +1,7 @@
-﻿using Application.Extensions;
+﻿using System.Collections.Immutable;
+
+using Application.Common.Models;
+using Application.Extensions;
 using Application.Registrations.Commands.CancelRegistration;
 using Application.Registrations.Commands.ConfirmPayment;
 using Application.Registrations.Commands.RestoreRegistration;
@@ -7,6 +10,7 @@ using Application.Registrations.Queries.GetUserRegistrations;
 using Bot.Extensions;
 using Bot.Forms.Common.Base;
 
+using Domain.Common;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -31,18 +35,18 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
 
         _confirmPaymentButton = new ActionButton(
             "Підтвердити оплату✅",
-            "cancelRegistration",
+            "confirmRegistration",
             ConfirmPayment
         );
         _cancelButton = new ActionButton(
             "Скасувати реєстрацію⚠️",
-            "confirmRegistration",
+            "cancelRegistration",
             CancelRegistration
         );
         _restoreRegistrationButton = new ActionButton(
-            "Відновити реєстрацію🔄",
-            "restoreRegistration",
-            RestoreRegistration
+            "Активувавати реєстрацію🔄",
+            "activateRegistration",
+            ActivateRegistration
         );
         _listTitle = "Мої записи";
         _mButtons.NoItemsLabel = "У вас поки немає реєстрацій";
@@ -116,7 +120,7 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
         LeaveLastMessage();
     }
 
-    private async Task RestoreRegistration()
+    private async Task ActivateRegistration()
     {
         var result = await _mediator.Send(
             new RestoreRegistrationCommand { Registration = _selectedEntity! }
@@ -124,16 +128,24 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
 
         await result.Match(
             (paymentStatus) =>
-                Device.Send(
-                    $"Ви відновили реєстрацію на {_selectedEntity!.Speaking.GetName()}"
-                        + (
-                            paymentStatus == PaymentStatus.PaidByTransferTicket
-                                ? "\nВаш квиток переносу використався, тому ваша реєстрація вже оплачена!"
-                                : "\nВам потрібно перерахувати"
-                                    + $" {_selectedEntity?.Speaking.Price} грн на картку:\n4441111137379347\n"
-                                    + $"Після цього підтвердити свою оплату в меню записів."
-                        )
-                ),
+            {
+                var message = paymentStatus switch
+                {
+                    PaymentStatus.PaidByTransferTicket
+                        => "Ваш квиток переносу використався, тому ваша реєстрація вже оплачена!",
+                    PaymentStatus.Pending
+                        => "Вам потрібно перерахувати"
+                            + $" {_selectedEntity?.Speaking.Price} грн на картку:\n4441111137379347\n"
+                            + $"Після цього підтвердити свою оплату в меню записів.",
+                    PaymentStatus.InReserve
+                        => "На жаль, всі місця на цей івент зайняті. Ви зараз знаходитесь в резерві."
+                            + " Ми вам повідомимо, якщо звільниться місце.",
+                    _ => "Непередбачений статус платежу. Зверніться до адміністратора."
+                };
+                return Device.Send(
+                    $"Ви активували реєстрацію на {_selectedEntity!.Speaking.GetName()}\n{message}"
+                );
+            },
             (error) => Device.Send(error.Message)
         );
         LeaveLastMessage();
@@ -171,8 +183,39 @@ public class MemberRegistrationListForm : ControlPanelForm<Registration>
             {
                 PaymentStatus.Pending => new[] { _confirmPaymentButton, _cancelButton },
                 PaymentStatus.ToBeApproved => Array.Empty<ActionButton>(),
-                PaymentStatus.Cancelled => new ActionButton[] { _restoreRegistrationButton },
-                _ => new ActionButton[] { _cancelButton },
+                PaymentStatus.Cancelled => new[] { _restoreRegistrationButton },
+                PaymentStatus.InReserve
+                    => ShowActivateButton(registration)
+                        ? new[] { _restoreRegistrationButton }
+                        : Array.Empty<ActionButton>(),
+                _ => new[] { _cancelButton },
             };
+    }
+
+    private bool ShowActivateButton(Registration registration)
+    {
+        Result<List<Registration>, Error> result = _mediator
+            .Send(new GetSpeakingRegistrations() { SpeakingId = registration.SpeakingId })
+            .Result;
+        if (result.IsSuccess)
+        {
+            ImmutableList<Guid> inReserve = result.Value!
+                .Where(
+                    r =>
+                        r.SpeakingId == registration.SpeakingId
+                        && r.PaymentStatus == PaymentStatus.InReserve
+                )
+                .OrderBy(r => r.RegistrationDate)
+                .Select(r => r.Id)
+                .ToImmutableList();
+            var availableSeats =
+                registration.Speaking.Seats
+                - result.Value!.Count(
+                    r => r.PaymentStatus is not (PaymentStatus.Cancelled or PaymentStatus.InReserve)
+                );
+            return inReserve.IndexOf(registration.Id) < availableSeats;
+        }
+
+        return false;
     }
 }

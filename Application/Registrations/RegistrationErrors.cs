@@ -21,11 +21,11 @@ public static class RegistrationErrors
         );
     public static readonly Error RegistrationAlreadyCancelled =
         new("Registration.RegistrationAlreadyCancelled", "Реєстрація вже скасована");
-    public static readonly Error RegistrationNotCancelled =
-        new(
-            "Registration.RegistrationNotCancelled",
-            "Реєстрація ще не скасована, для того щоб її відновити"
-        );
+    public static readonly Error RegistrationAlreadyActive =
+        new("Registration.RegistrationAlreadyActive", "Реєстрація вже активна");
     public static readonly Error PaymentNotPending =
         new("Registration.PaymentNotPending", "Реєстрація не очікує оплату");
+
+    public static readonly Error RegistrationInReserve =
+        new("Registration.RegistrationInReserve", "Для вас ще не звільнось місце на івенті");
 }

@@ -1,4 +1,6 @@
-﻿using Application.Common.Interfaces;
+﻿using System.Collections.Immutable;
+
+using Application.Common.Interfaces;
 using Application.Common.Models;
 
 using Domain.Common;
@@ -45,25 +47,74 @@ public class RestoreRegistrationCommandHandler
         )
             return RegistrationErrors.RegistrationTimeout;
 
-        if (registration.PaymentStatus == PaymentStatus.Cancelled)
-        {
-            if (registration.User.TransferTicket)
-            {
-                registration.PaymentStatus = PaymentStatus.PaidByTransferTicket;
-                registration.User.TransferTicket = false;
-            }
-            else
-                registration.PaymentStatus = PaymentStatus.Pending;
+        var speaking = await _context.Speakings
+            .Include(s => s.Registrations)
+            .FirstOrDefaultAsync(s => s.Id == request.Registration.SpeakingId);
 
-            registration.RegistrationDate = DateTime.UtcNow;
+        if (speaking == null)
+            return NotFoundErrors<Speaking>.EntityNotFound;
+
+        switch (registration.PaymentStatus)
+        {
+            case PaymentStatus.Cancelled:
+                HandleCancelled(registration, speaking);
+                break;
+            case PaymentStatus.InReserve:
+                if (!HandleInReserve(registration, speaking))
+                    return RegistrationErrors.RegistrationInReserve;
+                break;
+            default:
+                return RegistrationErrors.RegistrationAlreadyActive;
         }
-        else
-            return RegistrationErrors.RegistrationNotCancelled;
 
         registration.AddDomainEvent(
             new RegistrationCreatedEvent(registration, registration.User, registration.Speaking)
         );
         await _context.SaveChangesAsync(cancellationToken);
         return registration.PaymentStatus;
+    }
+
+    private void HandleCancelled(Registration registration, Speaking speaking)
+    {
+        var inReserve = speaking.Registrations.Count(
+            r => r.PaymentStatus == PaymentStatus.InReserve
+        );
+        if (inReserve >= speaking.AvailableSeats)
+        {
+            registration.PaymentStatus = PaymentStatus.InReserve;
+        }
+        else if (registration.User.TransferTicket)
+        {
+            registration.PaymentStatus = PaymentStatus.PaidByTransferTicket;
+            registration.User.TransferTicket = false;
+        }
+        else
+        {
+            registration.PaymentStatus = PaymentStatus.Pending;
+        }
+
+        registration.RegistrationDate = DateTime.UtcNow;
+    }
+
+    private bool HandleInReserve(Registration registration, Speaking speaking)
+    {
+        ImmutableList<Guid> inReserve = speaking.Registrations
+            .Where(
+                r =>
+                    r.SpeakingId == registration.SpeakingId
+                    && r.PaymentStatus == PaymentStatus.InReserve
+            )
+            .OrderBy(r => r.RegistrationDate)
+            .Select(r => r.Id)
+            .ToImmutableList();
+
+        if (inReserve.IndexOf(registration.Id) < registration.Speaking.AvailableSeats)
+        {
+            registration.PaymentStatus = PaymentStatus.Pending;
+            registration.RegistrationDate = DateTime.UtcNow;
+            return true;
+        }
+
+        return false;
     }
 }
