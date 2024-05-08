@@ -42,7 +42,7 @@ public class SpeakingListForm : ListItemsForm<Speaking>
     {
         return $"{speaking.Title}, {speaking.Venue.City} "
             + $"({PaidRegistrationsCount(speaking)}/"
-            + $"{speaking.Registrations.Count(r => r.PaymentStatus != PaymentStatus.Cancelled)}/{speaking.Seats})";
+            + $"{speaking.Seats - speaking.AvailableSeats}/{speaking.Seats})";
     }
 
     private static int PaidRegistrationsCount(Speaking speaking)
@@ -86,7 +86,7 @@ public class SpeakingListForm : ListItemsForm<Speaking>
         _messageToDelete = await Device.Send(
             $"{speaking.Title}, {speaking.Venue.City}\n\n"
                 + $"Оплатили: {PaidRegistrationsCount(speaking)}\n"
-                + $"Зареєстровані: {speaking.Registrations.Count(r => r.PaymentStatus != PaymentStatus.Cancelled)}\n"
+                + $"Зареєстровані: {speaking.Seats - speaking.AvailableSeats}\n"
                 + $"Максимальна к-сть місць: {speaking.Seats}",
             bf
         );
