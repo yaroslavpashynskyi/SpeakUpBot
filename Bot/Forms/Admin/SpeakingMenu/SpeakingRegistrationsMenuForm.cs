@@ -16,8 +16,6 @@ using Humanizer;
 
 using MediatR;
 
-using Telegram.Bot.Types;
-
 using TelegramBotBase.Args;
 
 namespace Bot.Forms.Admin.SpeakingMenu;
@@ -28,6 +26,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
 
     private readonly ActionButton _approveCardButton;
     private readonly ActionButton _approveCashButton;
+    private readonly ActionButton _cancelButton;
 
     public SpeakingRegistrationsMenuForm(IMediator mediator)
     {
@@ -42,6 +41,11 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
             "Підтвердити оплату готівкою💴",
             "confirmCash",
             CardPaymentConfirmation
+        );
+        _cancelButton = new ActionButton(
+            "Скасувати реєстрацію❌",
+            "cancelReg",
+            RegistrationCancellation
         );
 
         _mButtons.NoItemsLabel = "Реєстрацій на цей івент немає";
@@ -98,12 +102,13 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
     {
         if (entity.PaymentStatus == PaymentStatus.ToBeApproved)
         {
-            return new ActionButton[] { _approveCardButton, _approveCashButton };
+            return new[] { _approveCardButton, _approveCashButton };
         }
-        return Array.Empty<ActionButton>();
+
+        return new[] { _cancelButton };
     }
 
-    private async Task PaymentConfirmation(PaymentStatus paymentStatus, string successMessage)
+    private async Task ChangeStatus(PaymentStatus paymentStatus, string successMessage)
     {
         var result = await _mediator.Send(
             new ForceModifyStatusCommand
@@ -128,7 +133,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
 
     private async Task CardPaymentConfirmation()
     {
-        await PaymentConfirmation(
+        await ChangeStatus(
             PaymentStatus.ToBePaidByCash,
             "Ви успішно підтвердили, що користувач {0} оплатить/оплатив готівкою реєстрацію на {1}"
         );
@@ -136,9 +141,17 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
 
     private async Task CashPaymentConfirmation()
     {
-        await PaymentConfirmation(
+        await ChangeStatus(
             PaymentStatus.PaidByCard,
             "Ви успішно підтвердили оплату карткою користувача {0}, який зареєструвався на {1}"
+        );
+    }
+
+    private async Task RegistrationCancellation()
+    {
+        await ChangeStatus(
+            PaymentStatus.Cancelled,
+            "Ви успішно скасували реєстрацію користувача {0} на {1}"
         );
     }
 }
