@@ -85,14 +85,15 @@ public class AvailableSeatNotificationInterceptor : SaveChangesInterceptor
                     .Property(r => r.PaymentStatus)
                     .CurrentValue;
 
-                PaymentStatus[] statusesOfInterest =
-                {
-                    PaymentStatus.Cancelled,
-                    PaymentStatus.InReserve
-                };
                 if (
-                    statusesOfInterest.Contains(originalValue)
-                    || statusesOfInterest.Contains(currentValue)
+                    (
+                        currentValue == PaymentStatus.Cancelled
+                        && originalValue != PaymentStatus.InReserve
+                    )
+                    || (
+                        originalValue == PaymentStatus.InReserve
+                        && currentValue == PaymentStatus.Cancelled
+                    )
                 )
                 {
                     var speaking = await dbContext
@@ -101,33 +102,21 @@ public class AvailableSeatNotificationInterceptor : SaveChangesInterceptor
                         .ThenInclude(r => r.User)
                         .FirstOrDefaultAsync(s => s.Id == entityEntry.Entity.Speaking.Id);
 
-                    if (
-                        (
-                            currentValue == PaymentStatus.Cancelled
-                            && originalValue != PaymentStatus.InReserve
-                        )
-                        || (
-                            originalValue == PaymentStatus.InReserve
-                            && currentValue == PaymentStatus.Cancelled
-                        )
-                    )
-                    {
-                        /* New seat available or Reservation cancelled, notify a user in reserve
-                         whose ordinal number is how many seats are available - 1 */
-                        long userToNotify = speaking!.Registrations
-                            .Where(r => r.PaymentStatus == PaymentStatus.InReserve)
-                            .OrderBy(r => r.RegistrationDate)
-                            .Select(r => r.User.TelegramId)
-                            .ElementAtOrDefault(speaking.AvailableSeats - 1);
+                    /* New seat available or Reservation cancelled, notify a user in reserve
+                     whose ordinal number is how many seats are available - 1 */
+                    long userToNotify = speaking!.Registrations
+                        .Where(r => r.PaymentStatus == PaymentStatus.InReserve)
+                        .OrderBy(r => r.RegistrationDate)
+                        .Select(r => r.User.TelegramId)
+                        .ElementAtOrDefault(speaking.AvailableSeats - 1);
 
-                        if (userToNotify != 0)
-                        {
-                            await _notificationSender.SendToUser(
-                                $"Для вас з'явилось місце на {speaking.GetName()}!\n"
-                                    + $"Перейдіть в мої реєстрації та активуйте реєстрацію.",
-                                userToNotify
-                            );
-                        }
+                    if (userToNotify != 0)
+                    {
+                        await _notificationSender.SendToUser(
+                            $"Для вас з'явилось місце на {speaking.GetName()}!\n"
+                                + $"Перейдіть в мої реєстрації та активуйте реєстрацію.",
+                            userToNotify
+                        );
                     }
                 }
             }
