@@ -52,7 +52,10 @@ public class FutureSpeakingsForm : ListItemsForm<Speaking>
             if (_isRegistered)
                 await this.NavigateTo<MemberRegistrationListForm>();
             else
+            {
+                this.OldMessages = this.OldMessages.TakeLast(1).ToList();
                 await this.NavigateTo<CreateRegistrationForm>();
+            }
         }
     }
 
@@ -77,12 +80,12 @@ public class FutureSpeakingsForm : ListItemsForm<Speaking>
             }
         );
 
-        var button = new ButtonBase("Зареєструватись на цей івент", speaking.Id.ToString());
+        var button = new ButtonBase("Зареєструватись", speaking.Id.ToString());
         _isRegistered = result.Match(
             (registered) =>
             {
                 if (registered)
-                    button.Text = "Перейти до реєстрації";
+                    button.Text = "Перейти до запису";
                 return registered;
             },
             error =>
