@@ -34,7 +34,7 @@ public class ForceModifyStatusCommandHandler
     )
     {
         var registration = await _context.Registrations
-            .Include(r => r.Speaking)
+            .Include(r => r.Speaking.Venue)
             .Include(r => r.User)
             .FirstOrDefaultAsync(r => r.Id == request.RegistrationId);
 

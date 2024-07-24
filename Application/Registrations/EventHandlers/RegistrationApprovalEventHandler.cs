@@ -20,10 +20,17 @@ public class RegistrationApprovalEventHandler : INotificationHandler<Registratio
         CancellationToken cancellationToken
     )
     {
-        await _notificationSender.SendToUser(
-            $"Вітаємо, <b>{notification.User.FirstName}</b>!\n"
-                + $"Вашу оплату на {notification.Speaking.GetName()} підтверджено організатором!",
-            notification.User.TelegramId
+        var eventTime = notification.Speaking.TimeOfEvent.ToString(
+            "HH:mm dd MMMM",
+            new System.Globalization.CultureInfo("uk-UA")
         );
+        var venue = notification.Speaking.Venue;
+
+        var message =
+            $"Вітаємо, <b>{notification.User.FirstName}</b>!\n"
+            + $"Вашу оплату на {notification.Speaking.GetName()} підтверджено організатором!\n"
+            + $"Чекаємо вас об {eventTime} в закладі <a href=\"{venue.LocationUrl}\">{venue.Name}</a>.";
+
+        await _notificationSender.SendToUser(message, notification.User.TelegramId);
     }
 }

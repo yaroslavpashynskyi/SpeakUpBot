@@ -97,9 +97,11 @@ public class FutureSpeakingsForm : ListItemsForm<Speaking>
 
         var bf = new ButtonForm();
         bf.AddButtonRow(button);
-        sentPost = sentPost
-            .Append(await Device.Send($"Додаткові опції до {speaking.Title}", bf))
-            .ToArray();
+        var message = _isRegistered
+            ? "Ви вже зареєстровані на цей івент. Щоб перейти до запису натисність кнопку нижче"
+            : "Для реєстрації натисніть кнопку нижче";
+
+        sentPost = sentPost.Append(await Device.Send(message, bf)).ToArray();
 
         foreach (var postMessage in sentPost)
         {
