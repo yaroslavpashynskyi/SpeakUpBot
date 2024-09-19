@@ -1,6 +1,5 @@
 ﻿using Application.Common.Interfaces;
 using Application.Extensions;
-
 using Domain.Events;
 using MediatR;
 
@@ -20,10 +19,9 @@ public class RegistrationApprovalEventHandler : INotificationHandler<Registratio
         CancellationToken cancellationToken
     )
     {
-        var eventTime = notification.Speaking.TimeOfEvent.ToString(
-            "HH:mm dd MMMM",
-            new System.Globalization.CultureInfo("uk-UA")
-        );
+        var eventTime = notification
+            .Speaking.TimeOfEvent.ToLocalTime()
+            .ToString("HH:mm dd MMMM", new System.Globalization.CultureInfo("uk-UA"));
         var venue = notification.Speaking.Venue;
 
         var message =
