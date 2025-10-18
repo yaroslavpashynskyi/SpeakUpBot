@@ -106,7 +106,9 @@ public class CreateRegistrationForm : ListItemsForm<Speaking>
 
         if (message.RawData == _confirmButton.Value && _createdRegistration != null)
         {
-            await MessageCleanup();
+            await Device.EditReplyMarkup(message.MessageId, new ButtonForm());
+            LeaveLastMessage();
+            
             var confirmResult = await _mediator.Send(
                 new ConfirmPaymentCommand() { Registration = _createdRegistration }
             );
