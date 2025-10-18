@@ -20,7 +20,7 @@ public class RegistrationConfirmationEventHandler
     )
     {
         await _notificationSender.SendToGroup(
-            $"Користувач <b>{notification.User.LastName} {notification.User.FirstName}</b> "
+            $"Користувач <b>{notification.User.Name}</b> "
                 + $"підтвердив оплату на {notification.Speaking.Title}."
         );
     }

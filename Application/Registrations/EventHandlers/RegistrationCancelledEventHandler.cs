@@ -21,7 +21,7 @@ public class RegistrationCancelledEventHandler : INotificationHandler<Registrati
     )
     {
         await _notificationSender.SendToGroup(
-            $"Користувач <b>{notification.User.LastName} {notification.User.FirstName}</b> "
+            $"Користувач <b>{notification.User.Name}</b> "
                 + $"скасував запис на {notification.Speaking.Title}."
         );
     }

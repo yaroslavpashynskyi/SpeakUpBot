@@ -25,7 +25,7 @@ public class RegistrationApprovalEventHandler : INotificationHandler<Registratio
         var venue = notification.Speaking.Venue;
 
         var message =
-            $"Вітаємо, <b>{notification.User.FirstName}</b>!\n"
+            $"Вітаємо, <b>{notification.User.Name}</b>!\n"
             + $"Вашу оплату на {notification.Speaking.GetName()} підтверджено організатором!\n"
             + $"Чекаємо вас об {eventTime} в закладі <a href=\"{venue.LocationUrl}\">{venue.Name}</a>.";
 

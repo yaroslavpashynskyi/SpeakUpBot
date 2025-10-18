@@ -20,7 +20,7 @@ public class UsersListForm : ListItemsForm<User>
 
     protected override string GetButtonName(User user)
     {
-        return $"{user.FirstName} {user.LastName}";
+        return $"{user.Name}";
     }
 
     protected override async Task HandleEntity(User user)
@@ -28,12 +28,12 @@ public class UsersListForm : ListItemsForm<User>
         var transferTicketStatus = user.TransferTicket ? "Присутній✅" : "Відсутній🛑";
         await Device.Send(
             "Інформація про користувача.\n"
-                + $"Ім'я: {user.FirstName}\nПрізвище: {user.LastName}\n"
+                + $"Ім'я та Прізвище: {user.Name}\n"
                 + $"Номер телефону: {user.PhoneNumber}\n"
                 + $"Квиток переносу: {transferTicketStatus}\n"
                 + $"Дата реєстрації користувача: {user.CreatedAt.ToLocalTime()}\n"
                 + $"Рівень англійської: {user.EnglishLevel}\n"
-                + $"Як про нас дізнались: {user.Source.Title}\n\n"
+                + $"Як про нас дізнались: {user.Source?.Title}\n\n"
                 + $"<a href=\"tg://user?id={user.TelegramId}\">Зв'язатись з користувачем</a>",
             parseMode: ParseMode.Html
         );

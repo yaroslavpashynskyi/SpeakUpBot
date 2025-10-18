@@ -55,10 +55,8 @@ public class UserConfirmationForm : AutoCleanForm
             var userDataMessage =
                 $"Ваші особисті дані:\n"
                 + $"Номер телефону: {UserData.PhoneNumber}\n"
-                + $"Ім'я: {UserData.FirstName}\n"
-                + $"Прізвище: {UserData.LastName}\n"
+                + $"Ім'я та прізвище: {UserData.Name}\n"
                 + $"Рівень англійської: {UserData.EnglishLevel}\n"
-                + $"Звідки про нас дізнались: {UserData.Source.Title}\n"
                 + "Чи підтверджуєте ви ці дані?";
             await Device.Send(userDataMessage, bf);
 

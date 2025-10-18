@@ -25,7 +25,7 @@ public class RegisrationCreatedEventHandler : INotificationHandler<RegistrationC
     )
     {
         await _notificationSender.SendToGroup(
-            $"Користувач <b>{notification.User.LastName} {notification.User.FirstName}</b> "
+            $"Користувач <b>{notification.User.Name}</b> "
                 + $"записався на {notification.Speaking.Title}."
                 + $" Статус платежу реєстрації: {notification.Registration.PaymentStatus}"
         );

@@ -35,28 +35,19 @@ public class GetNameForm : AutoCleanForm
             await Device.Send("Ім'я та прізвище не може бути більше ніж 50 символів!");
             return;
         }
-        if (UserData.FirstName == null)
+        if (UserData.Name == null)
         {
-            UserData.FirstName = message.MessageText;
+            UserData.Name = message.MessageText;
             return;
         }
-        if (UserData.LastName == null)
-        {
-            UserData.LastName = message.MessageText;
-            return;
-        }
+
     }
 
     public override async Task Render(MessageResult message)
     {
-        if (UserData.FirstName == null)
+        if (UserData.Name == null)
         {
-            await Device.Send("Введіть своє справжнє ім'я", markup: new ReplyKeyboardRemove());
-            return;
-        }
-        if (UserData.LastName == null)
-        {
-            await Device.Send("Введіть своє прізвище");
+            await Device.Send("Введіть своє ім'я та прізвище", markup: new ReplyKeyboardRemove());
             return;
         }
 

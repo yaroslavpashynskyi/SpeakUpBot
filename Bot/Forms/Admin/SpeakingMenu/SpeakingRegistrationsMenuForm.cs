@@ -79,7 +79,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
 
     protected override string GetButtonName(Registration registration)
     {
-        return $"{registration.User.FirstName} {registration.User.LastName} "
+        return $"{registration.User.Name} "
             + $"Статус платежу: {registration.PaymentStatus.GetDescription()}";
     }
 
@@ -91,7 +91,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
             + $"Дата реєстрації: {registrationDate}, {registrationDate.Humanize(culture: new CultureInfo("uk-UA"))}\n"
             + $"Статус: {registration.PaymentStatus.GetDescription()}\n\n"
             + $"Інформація про користувача.\n"
-            + $"Ім'я: {registration.User.FirstName}\nПрізвище: {registration.User.LastName}\n"
+            + $"Ім'я та прізвище: {registration.User.Name}\n"
             + $"Номер телефону: {registration.User.PhoneNumber}\n"
             + $"Рівень англійської: {registration.User.EnglishLevel}\n"
             + $"Квиток переносу: {transferTicketStatus}\n\n"
@@ -122,7 +122,7 @@ public class SpeakingRegistrationsMenuForm : ControlPanelForm<Registration>
                 Device.Send(
                     string.Format(
                         successMessage,
-                        _selectedEntity?.User.FirstName,
+                        _selectedEntity?.User.Name,
                         _selectedEntity?.Speaking.GetName()
                     )
                 ),
